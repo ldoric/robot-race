@@ -11,6 +11,7 @@
                 "/Fe:",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
                 "${file}",
+                "robot-race/includes/g_math.cpp"
                 //!add all include cpp files here
             ],
             "problemMatcher": [
