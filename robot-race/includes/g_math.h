@@ -21,4 +21,13 @@ namespace gm{
 
   double sqroot(int); //takes in 1 int and returns square root of it as a double
   double sqroot(double); //takes in 1 double and returns square root of it as a double
+
+  int bigger(int, int); //takes in 2 ints and returns the bigger one, if both the same returns either
+  double bigger(double, double); //takes in 2 doubles and returns the bigger one, if both the same returns either
+
+  int smaller(int, int);  //takes in 2 ints and returns the smaller one, if both the same returns either
+  double smaller(double, double); //takes in 2 doubles and returns the smaller one, if both the same returns either
+
+  bool firstBigger(int, int); // takes in 2 ints and returns true if first is bigger than second, else false
+  bool firstBigger(double, double); // takes in 2 doubles and returns true if first is bigger than second, else false
 }

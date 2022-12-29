@@ -72,4 +72,34 @@ namespace gm
     return sqrt(number);
   }
 
+  int bigger(int first, int second)
+  {
+    return first ? (first > second) : second;
+  }
+
+  double bigger(double first, double second)
+  {
+    return first ? (first > second) : second;
+  }
+
+  int smaller(int first, int second)
+  {
+    return second ? (first > second) : first;
+  }
+
+  double smaller(double first, double second)
+  {
+    return second ? (first > second) : first;
+  }
+
+  bool firstBigger(int first, int second)
+  {
+    return true ? (first > second) : false;
+  }
+
+  bool firstBigger(double first, double second)
+  {
+    return true ? (first > second) : false;
+  }
+
 }
