@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string.h>
 
 //gmaz lib
 #include "includes/g_math.h"
@@ -36,14 +37,14 @@ int main()
 
   getMatrixSize(data, matW, matH);
   check_msg = createMatrix(lvlMatrix, matW, matH);
-  if(check_msg = NULL)
+  if(check_msg != SUCCESS)
   {
     std::cout<<"Memory failed to allocate" << std::endl;
     return MEMORY_ALLOC_ERROR;
   }
 
-  std::cout<< data[1][1] << std::endl;
-  //levelToMatrix(data, lvlMatrix);
+  //std::cout<< data[1] << std::endl;
+  levelToMatrix(data, lvlMatrix);
    
   return 0;
 }
@@ -55,12 +56,43 @@ int levelToMatrix(const std::string levelStr, char** matrix)
   getLevelSize(levelStr, strW, strH);
 
   
+  //ispis bez ,
+  for(int j = 0; j < strH; j++)
+  {
+    for(int i = 0; i < strW; i += 2)
+    {
+      std::cout<< levelStr[(strW*j)+i]<<" ";
+      //strcpy(matrix[i/2][j], "a");
+      //matrix[i/2][j] = 'b';
+      //matrix[i/2][j] = levelStr[(strW*j)+i];
+      //matrix[j/2][i] = levelStr[(strW*i)+j];
+      //ovo gore triba atribute koristit al logika je ta
+    }
+    std::cout<<std::endl;	
+  }
 
-  // for(int i = 0; i < strW; i = i + 2)
-  // {
-  //   for(int j = 0; i )
+  matrix[0][0] = 'b';
 
-  // }
+  //ipis nove matrice
+  for(int i = 0; i < strH; i++)
+  {
+    for(int j = 0; j < strW/2; j++)
+    {
+      matrix[i][j] = 'b';
+      //std::cout<< matrix[j][i]<<" ";
+    }
+    //std::cout<<std::endl;	
+  }
+
+  for(int i = 0; i < strH; i++)
+  {
+    for(int j = 0; j < strW/2; j++)
+    {
+      
+      std::cout<< matrix[i][j]<<" ";
+    }
+    std::cout<<std::endl;	
+  }
 
 
   return SUCCESS;
