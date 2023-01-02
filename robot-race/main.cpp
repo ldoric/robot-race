@@ -36,14 +36,33 @@ int main()
   
 
   getMatrixSize(data, matW, matH);
-  check_msg = createMatrix(lvlMatrix, matW, matH);
+  // check_msg = createMatrix(lvlMatrix, matW, matH);
+
+  //!this needs to be a seperate function
+  lvlMatrix = new char*[matH];
+  for (int i = 0; i<matH; ++i)
+  {
+    lvlMatrix[i] = new char[matW];
+
+    if (lvlMatrix[i] == nullptr)
+    {
+      check_msg =  MEMORY_ALLOC_ERROR;
+    }
+  }
+
+  if (lvlMatrix == nullptr)
+  {
+    check_msg = MEMORY_ALLOC_ERROR;
+  }
+
   if(check_msg != SUCCESS)
   {
     std::cout<<"Memory failed to allocate" << std::endl;
     return MEMORY_ALLOC_ERROR;
   }
+  //!-------------------
 
-  //std::cout<< data[1] << std::endl;
+
   levelToMatrix(data, lvlMatrix);
    
   return 0;
@@ -56,40 +75,21 @@ int levelToMatrix(const std::string levelStr, char** matrix)
   getLevelSize(levelStr, strW, strH);
 
   
-  //ispis bez ,
+  //inserting chars into matrix
   for(int j = 0; j < strH; j++)
   {
     for(int i = 0; i < strW; i += 2)
     {
-      std::cout<< levelStr[(strW*j)+i]<<" ";
-      //strcpy(matrix[i/2][j], "a");
-      //matrix[i/2][j] = 'b';
-      //matrix[i/2][j] = levelStr[(strW*j)+i];
-      //matrix[j/2][i] = levelStr[(strW*i)+j];
-      //ovo gore triba atribute koristit al logika je ta
+      matrix[j][i/2] = levelStr[(strW*j)+i];
     }
-    std::cout<<std::endl;	
   }
 
-  matrix[0][0] = 'b';
-
-  //ipis nove matrice
-  for(int i = 0; i < strH; i++)
+  //printing to check if it works
+  for(int j = 0; j < strH; j++)
   {
-    for(int j = 0; j < strW/2; j++)
+    for(int i = 0; i < strW/2; i++)
     {
-      matrix[i][j] = 'b';
-      //std::cout<< matrix[j][i]<<" ";
-    }
-    //std::cout<<std::endl;	
-  }
-
-  for(int i = 0; i < strH; i++)
-  {
-    for(int j = 0; j < strW/2; j++)
-    {
-      
-      std::cout<< matrix[i][j]<<" ";
+      std::cout<< matrix[j][i];
     }
     std::cout<<std::endl;	
   }
@@ -105,6 +105,11 @@ int createMatrix(char** matrix, int matW, int matH)
   for (int i = 0; i<matH; ++i)
   {
     matrix[i] = new char[matW];
+
+    if (matrix[i] == nullptr)
+    {
+      return MEMORY_ALLOC_ERROR;
+    }
   }
 
   if (matrix == nullptr){
@@ -112,7 +117,6 @@ int createMatrix(char** matrix, int matW, int matH)
   }
 
   return SUCCESS;
-
 }
 
 
