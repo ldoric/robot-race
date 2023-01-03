@@ -9,8 +9,8 @@
 #include "includes/g_string.h"
 
 //classes
-#include "level.h"
-//#include "classes/level.h"
+//#include "level.h"
+#include "classes/level.h"
 
 //constants
 #define FILE_READ_ERROR (-1)

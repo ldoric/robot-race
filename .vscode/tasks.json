@@ -13,8 +13,8 @@
                 "${file}",
                 "robot-race/includes/g_math.cpp",
                 "robot-race/includes/g_string.cpp",
-                "robot-race/classes/level.cpp",
-                "robot-race/plans/level.cpp"
+                //"robot-race/classes/level.cpp",
+                "robot-race/level.cpp"
                 //!add all include cpp files here
             ],
             "problemMatcher": [

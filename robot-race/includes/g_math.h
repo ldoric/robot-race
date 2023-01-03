@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 namespace gm{
 
   int add(int, int); //takes in 2 ints and return their sum in int type

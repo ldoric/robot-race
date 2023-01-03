@@ -1,28 +1,21 @@
 #include <iostream>
+#include "level.h"
 
 //available robots
 //myb use enum? togheter
-const char robotNames[4] = {'A', 'B', 'C', 'D'};
 
-class Field{
-
-  private:
-    char symbol;
-    bool isEnd;
-    bool isEmpty;
-
-
-  public:
-    Field()
+    Field::Field()
     {
       symbol = ' ';
       isEnd = false;
       isEmpty = true;
     }
 
-    Field(char newSymbol)
+
+    Field::Field(char newSymbol)
     {
       symbol = newSymbol;
+      std::cout<<"radi";
       
       if(symbol == '$'){
         isEnd = true;
@@ -34,39 +27,39 @@ class Field{
       isEmpty = false;
     }
 
-     Field(Field& secondObj)
+     Field::Field(Field& secondObj)
      {
        symbol = secondObj.symbol;
        isEnd = secondObj.isEnd;
        isEmpty = secondObj.isEmpty;
      }
 
-    //~Field(){;}
+    //Field::~Field(){;}
 
     //*used for mainloop for swapping current symbols
-    void swapObj(Field& a, Field& b)
+    void Field::swapObj(Field& a, Field& b)
     {
       Field temp = a;
       a = b;
       b = temp;
     }
 
-    bool getIsEmpty()
+    bool Field::getIsEmpty()
     {
       return isEmpty;
     }
 
-    bool getIsEnd()
+    bool Field::getIsEnd()
     {
       return isEnd;
     }
 
-    char getSymbol()
+    char Field::getSymbol()
     {
       return symbol;
     }
 
-     void setSymbol(char newSymbol) //used for adding robots to lvl after loading it (not used in mainloop)
+     void Field::setSymbol(char newSymbol) //used for adding robots to lvl after loading it (not used in mainloop)
     {
       //*only able to change symbol if inserting a robot
       for(auto name : robotNames)
@@ -86,4 +79,3 @@ class Field{
       
     }
 
-};
