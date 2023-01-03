@@ -10,6 +10,7 @@
 
 //classes
 #include "level.h"
+//#include "classes/level.h"
 
 //constants
 #define FILE_READ_ERROR (-1)
@@ -71,7 +72,7 @@ int main()
 
   //*test------------
   Field obj1('#');
-  Field obj2('A');
+  //Field obj2('A');
   
   // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
