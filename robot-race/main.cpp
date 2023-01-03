@@ -8,6 +8,9 @@
 #include "includes/g_math.h"
 #include "includes/g_string.h"
 
+//classes
+#include "level.h"
+
 //constants
 #define FILE_READ_ERROR (-1)
 #define SUCCESS (0)
@@ -64,7 +67,22 @@ int main()
 
 
   levelToMatrix(data, lvlMatrix);
-   
+
+
+  //*test------------
+  Field obj1('#');
+  Field obj2('A');
+  
+  // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
+  // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
+
+  // std::cout<< "swap" << std::endl;
+  // obj1.swapObj(obj1, obj2);
+
+  // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
+  // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
+  //*---------------
+
   return 0;
 }
 
