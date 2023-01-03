@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 
+
+//myb use enum
 const char robotNames[4] = {'A', 'B', 'C', 'D'};
 
 class Field{
