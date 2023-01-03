@@ -1,7 +1,6 @@
 #include <iostream>
 
 //available robots
-//myb use enum? togheter
 const char robotNames[4] = {'A', 'B', 'C', 'D'};
 
 class Field{
