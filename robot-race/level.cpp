@@ -11,7 +11,6 @@ Field::Field()
 Field::Field(char newSymbol)
 {
   symbol = newSymbol;
-  std::cout<<"radi";
   
   if(symbol == '$'){
     isEnd = true;
@@ -32,7 +31,7 @@ Field::Field(char newSymbol)
 
 //Field::~Field(){;}
 
-//*used for mainloop for swapping current symbols
+//*used in mainloop for swapping current symbols
 void Field::swapObj(Field& a, Field& b)
 {
   Field temp = a;

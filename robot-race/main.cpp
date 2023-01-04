@@ -19,23 +19,26 @@
 
 //function declarations
 int txtToString(std::string fileName, std::string& data);
-int levelToMatrix(std::string levelStr, char** matrix);
+int levelToMatrix(std::string levelStr, Field** matrix);
 int getLevelSize(const std::string levelStr, int& width, int& height);
 int getMatrixSize(const std::string levelStr, int& matW, int& matH);
-int createMatrix(char** matrix, int matW, int matH);
+int createMatrix(Field** matrix, int matW, int matH);
+void displayLevel(Field** matrix, int width, int height);
+void showLevelInfo(Field** matrix, int width, int height);
 
 
 int main()
 {
   std::string data;
-  char** lvlMatrix = nullptr;
+  Field** lvlMatrix = nullptr;
   int matW = 0, matH = 0;
   int check_msg = 0;
 
   txtToString("data/lvl1.txt", data);
 
+  std::cout<<"Printing out the loaded level"<<std::endl;
   std::cout<<data<<std::endl;
-  std::cout<<gs::strLen(data) << std::endl;
+  std::cout<<"Its size: "<<gs::strLen(data) << std::endl;
 
   
 
@@ -43,10 +46,10 @@ int main()
   // check_msg = createMatrix(lvlMatrix, matW, matH);
 
   //!this needs to be a seperate function
-  lvlMatrix = new char*[matH];
+  lvlMatrix = new Field*[matH];
   for (int i = 0; i<matH; ++i)
   {
-    lvlMatrix[i] = new char[matW];
+    lvlMatrix[i] = new Field[matW];
 
     if (lvlMatrix[i] == nullptr)
     {
@@ -66,13 +69,15 @@ int main()
   }
   //!-------------------
 
-
+  
   levelToMatrix(data, lvlMatrix);
-
+  std::cout<<"Printing the matrix after loading the level into it" <<std::endl;
+  displayLevel(lvlMatrix, matW, matH);
+  showLevelInfo(lvlMatrix, matW, matH);
 
   //*test------------
-  Field obj1('#');
-  //Field obj2('A');
+  // Field obj1('#');
+  // Field obj2('A');
   
   // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
@@ -87,8 +92,51 @@ int main()
   return 0;
 }
 
+void showLevelInfo(Field** matrix, int width, int height)
+{
+  std::cout<<"Showing level info:" << std::endl; 
 
-int levelToMatrix(const std::string levelStr, char** matrix)
+  char curr_symbol;
+  int count = 0;
+  int available_tiles = 0;
+  
+  for(int j = 0; j < height; j++)
+  {
+    for(int i = 0; i < width; i++)
+    {
+      curr_symbol = matrix[j][i].getSymbol();
+      for(auto robot : robotNames)
+      {
+        if(robot == curr_symbol)
+        {
+          count++;
+        }
+      }
+    }
+  }
+
+  available_tiles = (width*height) - (2*width + 2*height) + 4;
+
+  std::cout<<"\t- Matrix size: " << width << " x " << height << std::endl;
+  std::cout << "\t- Number of robots in level: " << count << std::endl;
+  std::cout << "\t- Number of non-wall tiles: " << available_tiles << std::endl;
+  std::cout << std::endl;
+}
+
+
+void displayLevel(Field** matrix, int width, int height)
+{
+  for(int j = 0; j < height; j++)
+  {
+    for(int i = 0; i < width; i++)
+    {
+      std::cout<< matrix[j][i].getSymbol();
+    }
+    std::cout<<std::endl;	
+  }
+}
+
+int levelToMatrix(const std::string levelStr, Field** matrix)
 {
   int strW = 0, strH = 0;
   getLevelSize(levelStr, strW, strH);
@@ -99,18 +147,8 @@ int levelToMatrix(const std::string levelStr, char** matrix)
   {
     for(int i = 0; i < strW; i += 2)
     {
-      matrix[j][i/2] = levelStr[(strW*j)+i];
+      matrix[j][i/2] = Field(levelStr[(strW*j)+i]);
     }
-  }
-
-  //printing to check if it works
-  for(int j = 0; j < strH; j++)
-  {
-    for(int i = 0; i < strW/2; i++)
-    {
-      std::cout<< matrix[j][i];
-    }
-    std::cout<<std::endl;	
   }
 
 
@@ -118,12 +156,12 @@ int levelToMatrix(const std::string levelStr, char** matrix)
 }
 
 
-int createMatrix(char** matrix, int matW, int matH)
+int createMatrix(Field** matrix, int matW, int matH)
 {
-  matrix = new char*[matH];
+  matrix = new Field*[matH];
   for (int i = 0; i<matH; ++i)
   {
-    matrix[i] = new char[matW];
+    matrix[i] = new Field[matW];
 
     if (matrix[i] == nullptr)
     {
