@@ -7,6 +7,7 @@
 //gmaz lib
 #include "includes/g_math.h"
 #include "includes/g_string.h"
+#include "includes/g_log.h"
 
 //classes
 //#include "level.h"
@@ -36,7 +37,7 @@ int main()
 
   txtToString("data/lvl1.txt", data);
 
-  std::cout<<"Printing out the loaded level"<<std::endl;
+  gl::displayMessage("Printing out the loaded level");
   std::cout<<data<<std::endl;
   std::cout<<"Its size: "<<gs::strLen(data) << std::endl;
 
@@ -64,14 +65,14 @@ int main()
 
   if(check_msg != SUCCESS)
   {
-    std::cout<<"Memory failed to allocate" << std::endl;
+    gl::displayMessage("Memory failed to allocate");
     return MEMORY_ALLOC_ERROR;
   }
   //!-------------------
 
   
   levelToMatrix(data, lvlMatrix);
-  std::cout<<"Printing the matrix after loading the level into it" <<std::endl;
+  gl::displayMessage("Printing the matrix after loading the level into it");
   displayLevel(lvlMatrix, matW, matH);
   showLevelInfo(lvlMatrix, matW, matH);
 
@@ -94,7 +95,7 @@ int main()
 
 void showLevelInfo(Field** matrix, int width, int height)
 {
-  std::cout<<"Showing level info:" << std::endl; 
+  gl::displayMessage("Showing level info:");
 
   char curr_symbol;
   int count = 0;
