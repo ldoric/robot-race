@@ -90,6 +90,10 @@ int main()
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
   //*---------------
 
+  gl::displayMessageInt("hej: ", 5);
+  gl::displayMessageFloat("hej: ", 5.1);
+  gl::displayMessageChar("hej: ", 'a');
+
   return 0;
 }
 
