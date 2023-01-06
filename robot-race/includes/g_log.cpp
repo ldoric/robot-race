@@ -7,18 +7,18 @@ namespace gl
     std::cout << message << std::endl;
   }
 
-  void displayMessageInt(std::string message, int num)
+  void displayMessageInt(std::string message, int number)
   {
-    std::cout << message << num << std::endl;
+    std::cout << message << number << std::endl;
   }
 
-  void displayMessageFloat(std::string message, float num)
+  void displayMessageFloat(std::string message, double number)
   {
-    std::cout << message << num << std::endl;
+    std::cout << message << number << std::endl;
   }
 
-  void displayMessageChar(std::string message, char x)
+  void displayMessageChar(std::string message, char sign)
   {
-    std::cout << message << x << std::endl;
+    std::cout << message << sign << std::endl;
   }
 }
