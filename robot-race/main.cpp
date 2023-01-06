@@ -90,9 +90,6 @@ int main()
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
   //*---------------
 
-  gl::displayMessageInt("hej: ", 5);
-  gl::displayMessageFloat("hej: ", 5.1);
-  gl::displayMessageChar("hej: ", 'a');
 
   return 0;
 }
@@ -103,7 +100,9 @@ void showLevelInfo(Field** matrix, int width, int height)
 
   char curr_symbol;
   int count = 0;
-  int available_tiles = 0;
+  int inside_tiles = 0;
+  int non_wall_tiles = 0;
+  int inside_walls = 0;
   
   for(int j = 0; j < height; j++)
   {
@@ -117,14 +116,20 @@ void showLevelInfo(Field** matrix, int width, int height)
           count++;
         }
       }
+
+      if((curr_symbol == '#') && (j != 0 && j != 5) && (i != 0 && i != 9))
+      {
+        inside_walls ++;
+      }
     }
   }
 
-  available_tiles = (width*height) - (2*width + 2*height) + 4;
+  inside_tiles = (width*height) - (2*width + 2*height) + 4;
+  non_wall_tiles = inside_tiles - inside_walls;
 
   std::cout<<"\t- Matrix size: " << width << " x " << height << std::endl;
   std::cout << "\t- Number of robots in level: " << count << std::endl;
-  std::cout << "\t- Number of non-wall tiles: " << available_tiles << std::endl;
+  std::cout << "\t- Number of non-wall tiles: " << non_wall_tiles << std::endl;
   std::cout << std::endl;
 }
 
@@ -152,7 +157,7 @@ int levelToMatrix(const std::string levelStr, Field** matrix)
   {
     for(int i = 0; i < strW; i += 2)
     {
-      matrix[j][i/2] = Field(levelStr[(strW*j)+i]);
+      matrix[j][i/2] = Field(levelStr[(strW*j)+i], j, i);
     }
   }
 
