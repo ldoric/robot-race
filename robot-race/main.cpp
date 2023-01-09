@@ -12,6 +12,7 @@
 //classes
 //#include "level.h"
 #include "classes/level.h"
+#include "classes/robot.h"
 
 //constants
 #define FILE_READ_ERROR (-1)
@@ -26,6 +27,7 @@ int getMatrixSize(const std::string levelStr, int& matW, int& matH);
 int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix, int width, int height);
 void showLevelInfo(Field** matrix, int width, int height);
+
 
 
 int main()
@@ -90,6 +92,10 @@ int main()
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
   //*---------------
 
+  lvlMatrix[1][1].createRobot('A');
+  gl::displayMessage("Printing the matrix after loading robots in it");
+  displayLevel(lvlMatrix, matW, matH);
+  showLevelInfo(lvlMatrix, matW, matH);
 
   return 0;
 }
@@ -157,7 +163,7 @@ int levelToMatrix(const std::string levelStr, Field** matrix)
   {
     for(int i = 0; i < strW; i += 2)
     {
-      matrix[j][i/2] = Field(levelStr[(strW*j)+i], j, i);
+      matrix[j][i/2] = Field(levelStr[(strW*j)+i], j, i/2);
     }
   }
 

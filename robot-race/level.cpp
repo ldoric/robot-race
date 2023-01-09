@@ -1,13 +1,18 @@
 #include <iostream>
 #include "classes/level.h"
 
+
+
+
 Field::Field()
 {
   symbol = '?';
   isEnd = false;
-  isEmpty = true;
+  isEmpty = false;
   isRobot = false;
   isWall = false;
+  noSymbol = true;
+
   coords[0] = 0, coords[1] = 1;
 }
 
@@ -45,7 +50,16 @@ Field::Field(char newSymbol, int x_coord, int y_coord)
     }
   }
 
-  isEmpty = false;
+  if(symbol == '_')
+  {
+    isEmpty = true;
+  }
+  else
+  {
+    isEmpty = false;
+  }
+
+  noSymbol = false;
 }
 
 Field::Field(Field &secondObj)
@@ -95,20 +109,29 @@ char Field::getSymbol()
   return symbol;
 }
 
-void Field::setSymbol(char newSymbol) // used for adding robots to lvl after loading it (not used in mainloop)
+void Field::createRobot(char robotSymbol)
 {
   //*only able to change symbol if inserting a robot
-  for (auto name : robotNames)
+  if(isEmpty)
   {
-    if (newSymbol == name)
+    for (auto name : robotNames)
     {
-      symbol = newSymbol;
-      break;
+      if (robotSymbol == name)
+      {
+        symbol = robotSymbol;
+        isRobot = true;
+        isEmpty = false;
+        break;
+      }
     }
   }
+  //?*idk what is the real use of this
   // for testing, remove/change after
+  /*
   if (newSymbol != symbol)
   {
     std::cout << "Not able to change the symbol!" << std::endl;
   }
+  */
 }
+

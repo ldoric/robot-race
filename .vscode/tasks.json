@@ -14,7 +14,8 @@
                 "robot-race/includes/g_math.cpp",
                 "robot-race/includes/g_string.cpp",
                 "robot-race/includes/g_log.cpp",
-                "robot-race/level.cpp"
+                "robot-race/level.cpp",
+                "robot-race/robot.cpp"
                 //!add all include cpp files here
             ],
             "problemMatcher": [

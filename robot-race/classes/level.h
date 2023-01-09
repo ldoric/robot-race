@@ -5,15 +5,17 @@
 //myb use enum
 const char robotNames[4] = {'A', 'B', 'C', 'D'};
 
-class Field{
+class Field
+{
 
   private:
     char symbol;
-    bool isEnd;
-    bool isEmpty;
-    bool isRobot;
-    bool isWall;
-    int coords[2];
+    bool isEnd; // if true, symbol == '$'
+    bool isEmpty; // if true, symbol == '_'
+    bool isRobot; // if true, symbol == 'A', 'B', 'C', 'D'
+    bool isWall; // if true, symbol == '#'
+    bool noSymbol;
+    int coords[2]; // x = coords[0], y = cords[1]
 
   public:
     Field();
@@ -22,12 +24,12 @@ class Field{
     //~Field();
   
     void swapObj(Field& a, Field& b);
+    void createRobot(char robotSymbol);
     bool getIsEmpty();
     bool getIsEnd();
     bool getIsWall();
     bool getIsRobot();
     char getSymbol();
-    void setSymbol(char newSymbol);
 
 };
 
