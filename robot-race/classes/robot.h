@@ -19,7 +19,8 @@ class Robots{
     Robots(char newSymbol, int x_coord, int y_coord);
     Robots(Robots& secondObj);
     void setRobot(char newSymbol, int x_coord, int y_coord);
+    //can be used(edited version) in robot moving position because its not used when robot is created 
     void printInfo();
-    //getRobot
+    //printing symbol and coords
 
 };

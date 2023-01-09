@@ -25,11 +25,13 @@ class Field
   
     void swapObj(Field& a, Field& b);
     void createRobot(char robotSymbol);
+    //swapping _ with a new robot symbol
     bool getIsEmpty();
     bool getIsEnd();
     bool getIsWall();
     bool getIsRobot();
     char getSymbol();
+    //returning symbol from these coords
 
 };
 

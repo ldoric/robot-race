@@ -50,10 +50,6 @@ int main()
 
   txtToString("data/lvl1.txt", data);
 
-
-
-  
-
   getMatrixSize(data, matW, matH);
   // check_msg = createMatrix(lvlMatrix, matW, matH);
 
@@ -273,11 +269,11 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int matW, int matH, int coun
     return MEMORY_ALLOC_ERROR;
   }
 
-  char symbol = robotNames[counter]; 
+  char symbol = robotNames[counter]; // A B C or D
 
-  matrix[matH][matW].createRobot(symbol);
+  matrix[matH][matW].createRobot(symbol); // in matrix swapping an _ with robot symbol
 
-  robot[counter] = Robots(symbol, matW, matH);
+  robot[counter] = Robots(symbol, matW, matH); // new object in the Robots class
 
   return SUCCESS;
 }
@@ -295,14 +291,17 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
 
   //*here we will give option of manual or random coords
   //for now we will do this manual
+  
   //manual coords
 
   gl::displayMessage("");
 
+  //creating robotNum amount of robots (objects of robots class and in matrix)
   for (counter=0; counter<robotNum; counter++)
   {
     gl::displayMessageChar("ROBOT ", robotNames[counter]);
 
+    //inputing coords and cheking if the given coords are empty/inside the matrix
     do
     {
       gl::displayMessage("enter x and y coords: ");
@@ -316,7 +315,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
       }
       else if((coords_x > Field::matrixWidth-1) || (coords_y > Field::matrixHeight-1))
       {
-        gl::displayMessage("coordinates are outise of the matrix!");
+        gl::displayMessage("coordinates are outside of the matrix!");
         gl::displayMessageInt("keep width under ", Field::matrixWidth);
         gl::displayMessageInt("keep height under ", Field::matrixHeight);
         continue;
@@ -339,4 +338,11 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
 }
 
 //TODO
-//
+//pb add comments to your functions
+//creating robots at random coords
+//create header file for main
+//move allocating memory to function
+//fix [y][x] and (..., x, y) problem
+//fix robotName issue
+//for int functions check msg
+//start moving the robots...
