@@ -18,6 +18,7 @@
 #define FILE_READ_ERROR (-1)
 #define SUCCESS (0)
 #define MEMORY_ALLOC_ERROR (-1)
+#define MAX_ROBOTS (4)
 
 //function declarations
 int txtToString(std::string fileName, std::string& data);
@@ -25,23 +26,31 @@ int levelToMatrix(std::string levelStr, Field** matrix);
 int getLevelSize(const std::string levelStr, int& width, int& height);
 int getMatrixSize(const std::string levelStr, int& matW, int& matH);
 int createMatrix(Field** matrix, int matW, int matH);
-void displayLevel(Field** matrix, int width, int height);
-void showLevelInfo(Field** matrix, int width, int height);
+void displayLevel(Field** matrix);
+void showLevelInfo(Field** matrix);
+int addRobotToMatrix(Field** matrix, Robots* robot, int width, int height, int counter/*uses robotNames to get symbol*/); 
+//adds 1 robot in the already created matrix and creates a Robot object 
+int createRobots(Field** matrix, Robots* robot, int robotNum);
+//calling addRobotToMatrix for each robot, manual or random coords
 
-
+//*-----------------------------------------------------------------------------------
+//* when calling matrix cords its matrix[y][x], but we call functions like (..., x, y)
+//* we should try fixing this so that is allways x,y  
+//*-----------------------------------------------------------------------------------
 
 int main()
 {
   std::string data;
   Field** lvlMatrix = nullptr;
+  Robots* Robot = nullptr;
+  Robot = new Robots[4];
   int matW = 0, matH = 0;
   int check_msg = 0;
+  int robotNum = 0;
 
   txtToString("data/lvl1.txt", data);
 
-  gl::displayMessage("Printing out the loaded level");
-  std::cout<<data<<std::endl;
-  std::cout<<"Its size: "<<gs::strLen(data) << std::endl;
+
 
   
 
@@ -49,6 +58,7 @@ int main()
   // check_msg = createMatrix(lvlMatrix, matW, matH);
 
   //!this needs to be a seperate function
+  //*allocating matrix
   lvlMatrix = new Field*[matH];
   for (int i = 0; i<matH; ++i)
   {
@@ -70,13 +80,21 @@ int main()
     gl::displayMessage("Memory failed to allocate");
     return MEMORY_ALLOC_ERROR;
   }
+  //*allocating robot
+  while ((robotNum < 1) || (robotNum > MAX_ROBOTS))
+  {
+    gl::displayMessage("enter number of robots (max 4):");
+    std::cin>> robotNum; 
+  }
+  Robot = new Robots[robotNum];
+  gl::displayMessage("");
   //!-------------------
 
   
   levelToMatrix(data, lvlMatrix);
   gl::displayMessage("Printing the matrix after loading the level into it");
-  displayLevel(lvlMatrix, matW, matH);
-  showLevelInfo(lvlMatrix, matW, matH);
+  displayLevel(lvlMatrix);
+  
 
   //*test------------
   // Field obj1('#');
@@ -92,18 +110,21 @@ int main()
   // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
   //*---------------
 
-  lvlMatrix[1][1].createRobot('A');
+  createRobots(lvlMatrix, Robot, robotNum);
+
   gl::displayMessage("Printing the matrix after loading robots in it");
-  displayLevel(lvlMatrix, matW, matH);
-  showLevelInfo(lvlMatrix, matW, matH);
+  displayLevel(lvlMatrix);
+  showLevelInfo(lvlMatrix);
 
   return 0;
 }
 
-void showLevelInfo(Field** matrix, int width, int height)
+void showLevelInfo(Field** matrix)
 {
   gl::displayMessage("Showing level info:");
 
+  int width = Field::matrixWidth;
+  int height = Field::matrixHeight;
   char curr_symbol;
   int count = 0;
   int inside_tiles = 0;
@@ -140,17 +161,18 @@ void showLevelInfo(Field** matrix, int width, int height)
 }
 
 
-void displayLevel(Field** matrix, int width, int height)
+void displayLevel(Field** matrix)
 {
-  for(int j = 0; j < height; j++)
+  for(int j = 0; j < Field::matrixHeight; j++)
   {
-    for(int i = 0; i < width; i++)
+    for(int i = 0; i <Field::matrixWidth; i++)
     {
       std::cout<< matrix[j][i].getSymbol();
     }
     std::cout<<std::endl;	
   }
 }
+
 
 int levelToMatrix(const std::string levelStr, Field** matrix)
 {
@@ -167,6 +189,8 @@ int levelToMatrix(const std::string levelStr, Field** matrix)
     }
   }
 
+  Field::matrixWidth = strW/2;
+  Field::matrixHeight = strH;
 
   return SUCCESS;
 }
@@ -221,6 +245,7 @@ int getLevelSize(const std::string levelStr, int& width, int& height)
   return SUCCESS;
 }
 
+
 int txtToString(std::string fileName, std::string& data)
 {
   std::ifstream ip;
@@ -240,3 +265,78 @@ int txtToString(std::string fileName, std::string& data)
   ip.close();
   return SUCCESS;
 }
+
+
+int addRobotToMatrix(Field** matrix, Robots* robot, int matW, int matH, int counter) 
+{
+  if ((matrix == nullptr) || (robot == nullptr)){
+    return MEMORY_ALLOC_ERROR;
+  }
+
+  char symbol = robotNames[counter]; 
+
+  matrix[matH][matW].createRobot(symbol);
+
+  robot[counter] = Robots(symbol, matW, matH);
+
+  return SUCCESS;
+}
+
+
+int createRobots(Field** matrix, Robots* robot, int robotNum)
+{
+  if ((matrix == nullptr) || (robot == nullptr)){
+    return MEMORY_ALLOC_ERROR;
+  }
+
+  int counter = 0; //uses robotNames to get symbol
+  int coords_x = 0;
+  int coords_y = 0;
+
+  //*here we will give option of manual or random coords
+  //for now we will do this manual
+  //manual coords
+
+  gl::displayMessage("");
+
+  for (counter=0; counter<robotNum; counter++)
+  {
+    gl::displayMessageChar("ROBOT ", robotNames[counter]);
+
+    do
+    {
+      gl::displayMessage("enter x and y coords: ");
+      std::cin >> coords_x;
+      std::cin >> coords_y;
+
+      if ((coords_x < 0) || (coords_y < 0))
+      {
+        gl::displayMessage("coordinates can't be neagtive!");
+        continue;
+      }
+      else if((coords_x > Field::matrixWidth-1) || (coords_y > Field::matrixHeight-1))
+      {
+        gl::displayMessage("coordinates are outise of the matrix!");
+        gl::displayMessageInt("keep width under ", Field::matrixWidth);
+        gl::displayMessageInt("keep height under ", Field::matrixHeight);
+        continue;
+      }
+      else if(!(matrix[coords_y][coords_x].getIsEmpty()))
+      {
+        gl::displayMessage("coordinates are not empty!");
+        continue;
+      }
+
+      break;
+      
+    } while(1);
+    
+    gl::displayMessage("");
+    addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
+  }
+
+  return SUCCESS;
+}
+
+//TODO
+//

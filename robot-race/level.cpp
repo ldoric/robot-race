@@ -2,8 +2,6 @@
 #include "classes/level.h"
 
 
-
-
 Field::Field()
 {
   symbol = '?';
@@ -124,7 +122,7 @@ void Field::createRobot(char robotSymbol)
         break;
       }
     }
-  }
+  } 
   //?*idk what is the real use of this
   // for testing, remove/change after
   /*
@@ -134,4 +132,7 @@ void Field::createRobot(char robotSymbol)
   }
   */
 }
+
+int Field::matrixWidth = 0;
+int Field::matrixHeight = 0;
 

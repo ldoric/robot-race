@@ -1,8 +1,6 @@
 #pragma once
 #include <iostream>
 
-
-//myb use enum
 const char robotNames[4] = {'A', 'B', 'C', 'D'};
 
 class Field
@@ -18,6 +16,8 @@ class Field
     int coords[2]; // x = coords[0], y = cords[1]
 
   public:
+    static int matrixWidth; //myb this should be const?
+    static int matrixHeight;
     Field();
     Field(char newSymbol, int x_coord, int y_coord);
     Field(Field& secondObj);

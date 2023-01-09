@@ -8,15 +8,18 @@ files in main */
 //*_________________
 const char robotSymbols[4] = {'A', 'B', 'C', 'D'};
 
-class Robot{
+class Robots{
 
   private:
     char symbol;
     int coords[2];
 
   public:
-    Robot();
-    Robot(char newSymbol, int x_coord, int y_coord);
-    Robot(Robot& secondObj);
+    Robots();
+    Robots(char newSymbol, int x_coord, int y_coord);
+    Robots(Robots& secondObj);
+    void setRobot(char newSymbol, int x_coord, int y_coord);
+    void printInfo();
+    //getRobot
 
 };
