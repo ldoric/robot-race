@@ -21,7 +21,7 @@
 #define MAX_ROBOTS (4)
 
 //function declarations
-int txtToString(std::string fileName, std::string& data);
+int levelLoad(std::string fileName, std::string& data);
 int levelToMatrix(std::string levelStr, Field** matrix);
 int getLevelSize(const std::string levelStr, int& width, int& height);
 int getMatrixSize(const std::string levelStr, int& matW, int& matH);
@@ -41,6 +41,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum);
 int main()
 {
   std::string data;
+  std::string levelName;
   Field** lvlMatrix = nullptr;
   Robots* Robot = nullptr;
   Robot = new Robots[4];
@@ -48,7 +49,15 @@ int main()
   int check_msg = 0;
   int robotNum = 0;
 
-  txtToString("data/lvl1.txt", data);
+  gl::displayMessage("Enter level name (txt file): ");
+  std::cin>>levelName;
+
+  check_msg = levelLoad("data/" + levelName, data);
+
+  if(check_msg != SUCCESS){
+    gl::displayMessage("Level failed to load, check your input!");
+    return FILE_READ_ERROR;
+  }
 
   getMatrixSize(data, matW, matH);
   // check_msg = createMatrix(lvlMatrix, matW, matH);
@@ -76,6 +85,10 @@ int main()
     gl::displayMessage("Memory failed to allocate");
     return MEMORY_ALLOC_ERROR;
   }
+  //!-------------------
+
+
+  //!this needs to be a seperate function
   //*allocating robot
   while ((robotNum < 1) || (robotNum > MAX_ROBOTS))
   {
@@ -91,20 +104,6 @@ int main()
   gl::displayMessage("Printing the matrix after loading the level into it");
   displayLevel(lvlMatrix);
   
-
-  //*test------------
-  // Field obj1('#');
-  // Field obj2('A');
-  
-  // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
-  // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
-
-  // std::cout<< "swap" << std::endl;
-  // obj1.swapObj(obj1, obj2);
-
-  // std::cout<< "obj1:" << obj1.getSymbol() << std::endl;
-  // std::cout<< "obj2:" << obj2.getSymbol() << std::endl;
-  //*---------------
 
   createRobots(lvlMatrix, Robot, robotNum);
 
@@ -242,13 +241,13 @@ int getLevelSize(const std::string levelStr, int& width, int& height)
 }
 
 
-int txtToString(std::string fileName, std::string& data)
+int levelLoad(std::string fileName, std::string& data)
 {
   std::ifstream ip;
   ip.open(fileName);
 
   if (ip.fail()){
-    std::cout<<"Fail failed to open!" << std::endl;
+    std::cout<<"File not found!" << std::endl;
     return FILE_READ_ERROR;
   }
 
@@ -337,12 +336,14 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   return SUCCESS;
 }
 
+
 //TODO
-//pb add comments to your functions
-//creating robots at random coords
-//create header file for main
-//move allocating memory to function
-//fix [y][x] and (..., x, y) problem
-//fix robotName issue
-//for int functions check msg
-//start moving the robots...
+  //pb add comments to your functions
+  //creating robots at random coords
+  //create header file for main
+  //move allocating memory to function
+  //fix [y][x] and (..., x, y) problem
+  //fix robotName issue
+  //for int functions check msg
+  //start moving the robots...
+//TODO  
