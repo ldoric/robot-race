@@ -29,7 +29,7 @@ int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix);
 void showLevelInfo(Field** matrix);
 int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord);
-int addRobotToMatrix(Field** matrix, Robots* robot, int width, int height, int counter/*uses robotNames to get symbol*/); 
+int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
 //adds 1 robot in the already created matrix and creates a Robot object 
 int createRobots(Field** matrix, Robots* robot, int robotNum);
 //calling addRobotToMatrix for each robot, manual or random coords
@@ -263,7 +263,7 @@ int levelLoad(std::string fileName, std::string& data)
 }
 
 
-int addRobotToMatrix(Field** matrix, Robots* robot, int matW, int matH, int counter) 
+int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter) 
 {
   if ((matrix == nullptr) || (robot == nullptr)){
     return MEMORY_ALLOC_ERROR;
@@ -271,9 +271,9 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int matW, int matH, int coun
 
   char symbol = robotNames[counter]; // A B C or D
 
-  matrix[matH][matW].createRobot(symbol); // in matrix swapping an _ with robot symbol
+  matrix[coord_y][coord_x].createRobot(symbol); // in matrix swapping an _ with robot symbol
 
-  robot[counter] = Robots(symbol, matW, matH); // new object in the Robots class
+  robot[counter] = Robots(symbol, coord_x, coord_y); // new object in the Robots class
 
   return SUCCESS;
 }
@@ -329,6 +329,15 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   int coords_x = 0;
   int coords_y = 0;
   bool manual_input = false;
+  char input = ' ';
+
+  std::cout<<std::endl; //make gl::newLine
+  gl::displayMessage("Would you like to insert them manually (y/n):");
+  std::cin>>input;
+
+  if(input == 'y'){
+    manual_input = true;
+  }
 
   //*random option
   if (!manual_input)
