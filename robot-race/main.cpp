@@ -28,6 +28,7 @@ int getMatrixSize(const std::string levelStr, int& matW, int& matH);
 int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix);
 void showLevelInfo(Field** matrix);
+int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord);
 int addRobotToMatrix(Field** matrix, Robots* robot, int width, int height, int counter/*uses robotNames to get symbol*/); 
 //adds 1 robot in the already created matrix and creates a Robot object 
 int createRobots(Field** matrix, Robots* robot, int robotNum);
@@ -277,6 +278,46 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int matW, int matH, int coun
   return SUCCESS;
 }
 
+int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
+{
+  bool not_occupied;
+  bool in_level;
+
+  const int matH = Field::matrixHeight;
+  const int matW = Field::matrixWidth;
+
+  do
+  {
+    not_occupied = true;
+    in_level = true;
+
+    x_coord = 1 + rand()%(matH - 1);
+    y_coord = 1 + rand()%(matW - 1);
+
+    //this shouldn't ever happen but just to be sure for now
+    if((x_coord <= 0 || x_coord >= matH) || (y_coord <= 0 || y_coord >= matW))
+    {
+      in_level = false;
+      //gl::displayMessage("Out of bounds!");
+    }
+
+    else if(matrix[x_coord][y_coord].getSymbol() != '_')
+    {
+      not_occupied = false;
+      //gl::displayMessage("Tile not empty!");
+    } 
+
+    else
+    {;} 
+
+
+  } while(!not_occupied || !in_level);
+  
+  
+
+
+  return SUCCESS;
+}
 
 int createRobots(Field** matrix, Robots* robot, int robotNum)
 {
@@ -287,51 +328,71 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   int counter = 0; //uses robotNames to get symbol
   int coords_x = 0;
   int coords_y = 0;
+  bool manual_input = false;
 
-  //*here we will give option of manual or random coords
-  //for now we will do this manual
-  
-  //manual coords
-
-  gl::displayMessage("");
-
-  //creating robotNum amount of robots (objects of robots class and in matrix)
-  for (counter=0; counter<robotNum; counter++)
+  //*random option
+  if (!manual_input)
   {
-    gl::displayMessageChar("ROBOT ", robotNames[counter]);
+    srand(time(NULL));
 
-    //inputing coords and cheking if the given coords are empty/inside the matrix
-    do
+    for (counter=0; counter<robotNum; counter++)
     {
-      gl::displayMessage("enter x and y coords: ");
-      std::cin >> coords_x;
-      std::cin >> coords_y;
+      generateRandomCoords(matrix, coords_x, coords_y);
 
-      if ((coords_x < 0) || (coords_y < 0))
-      {
-        gl::displayMessage("coordinates can't be neagtive!");
-        continue;
-      }
-      else if((coords_x > Field::matrixWidth-1) || (coords_y > Field::matrixHeight-1))
-      {
-        gl::displayMessage("coordinates are outside of the matrix!");
-        gl::displayMessageInt("keep width under ", Field::matrixWidth);
-        gl::displayMessageInt("keep height under ", Field::matrixHeight);
-        continue;
-      }
-      else if(!(matrix[coords_y][coords_x].getIsEmpty()))
-      {
-        gl::displayMessage("coordinates are not empty!");
-        continue;
-      }
+      gl::displayMessageInt("Adding robot ", counter+1);
+      addRobotToMatrix(matrix, robot, coords_y, coords_x, counter);
+    }
 
-      break;
-      
-    } while(1);
-    
+
+  } //end of random part
+  
+  else
+  {
+    //*manual option
     gl::displayMessage("");
-    addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
-  }
+
+    //creating robotNum amount of robots (objects of robots class and in matrix)
+    for (counter=0; counter<robotNum; counter++)
+    {
+      gl::displayMessageChar("ROBOT ", robotNames[counter]);
+
+      //inputing coords and cheking if the given coords are empty/inside the matrix
+      do
+      {
+        gl::displayMessage("enter x and y coords: ");
+        std::cin >> coords_x;
+        std::cin >> coords_y;
+
+        if ((coords_x < 0) || (coords_y < 0))
+        {
+          gl::displayMessage("coordinates can't be neagtive!");
+          continue;
+        }
+        else if((coords_x > Field::matrixWidth-1) || (coords_y > Field::matrixHeight-1))
+        {
+          gl::displayMessage("coordinates are outside of the matrix!");
+          gl::displayMessageInt("keep width under ", Field::matrixWidth);
+          gl::displayMessageInt("keep height under ", Field::matrixHeight);
+          continue;
+        }
+        else if(!(matrix[coords_y][coords_x].getIsEmpty()))
+        {
+          gl::displayMessage("coordinates are not empty!");
+          continue;
+        }
+
+        break;
+        
+      } while(1);
+      
+      gl::displayMessage("");
+      addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
+    }
+  
+  }//end of manual part
+
+
+  
 
   return SUCCESS;
 }
