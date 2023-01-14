@@ -23,7 +23,7 @@ class Field
     Field(Field& secondObj);
     //~Field();
   
-    void swapObj(Field& a, Field& b);
+    void swapObj(Field& a);
     void createRobot(char robotSymbol);
     //swapping _ with a new robot symbol
     bool getIsEmpty();

@@ -75,11 +75,11 @@ Field::Field(Field &secondObj)
 // Field::~Field(){;}
 
 //*used in mainloop for swapping current symbols
-void Field::swapObj(Field &a, Field &b)
+void Field::swapObj(Field &a)
 {
-  Field temp = a;
-  a = b;
-  b = temp;
+  Field temp = *this;
+  *this = a;
+  a = temp;
 }
 
 bool Field::getIsEmpty()

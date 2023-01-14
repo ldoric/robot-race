@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
+#include <iterator>
+#include <list>
 
 //gmaz lib
 #include "includes/g_math.h"
@@ -33,9 +35,11 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, in
 //adds 1 robot in the already created matrix and creates a Robot object 
 int createRobots(Field** matrix, Robots* robot, int robotNum);
 //calling addRobotToMatrix for each robot, manual or random coords
+int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
+//if it's not wall, move robot - in matrix and robot class, also logging old coords
 
 //*-----------------------------------------------------------------------------------
-//* when calling matrix cords its matrix[y][x], but we call functions like (..., x, y)
+//* when calling matrix coords its matrix[y][x], but we call functions like (..., x, y)
 //* we should try fixing this so that is allways x,y  
 //*-----------------------------------------------------------------------------------
 
@@ -110,7 +114,13 @@ int main()
 
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
-  showLevelInfo(lvlMatrix);
+  //showLevelInfo(lvlMatrix);
+
+  moveRobot(lvlMatrix, Robot, 0, 0, 0);
+  //moveRobot(lvlMatrix, Robot, 0, 1, 0);
+  displayLevel(lvlMatrix);
+  Robot[0].printInfo();
+  Robot[0].printMovmentHistory();
 
   return 0;
 }
@@ -406,14 +416,42 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   return SUCCESS;
 }
 
+int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter)
+{
+  if ((matrix == nullptr) || (robot == nullptr)){
+    return MEMORY_ALLOC_ERROR;
+  }
+
+  //if new coords are wall - log and cancel
+  if (matrix[coord_y][coord_x].getIsWall())
+  {
+    gl::displayMessage("zid");
+    robot[counter].foundNewWall(coord_x, coord_y);
+
+    return SUCCESS;
+  }
+
+  int robotCoord_x = robot[counter].coords[0];
+  int robotCoord_y = robot[counter].coords[1];
+  //these are the old robot coords
+  //new coords are coord_x and coord_y
+
+  robot[counter].newCoords(coord_x, coord_y);
+  //setting new coords in robot object
+
+  matrix[robotCoord_y][robotCoord_x].swapObj(matrix[coord_y][coord_x]);
+  //swapping objects in matrix
+
+  return SUCCESS;
+}
 
 //TODO
   //pb add comments to your functions
-  //creating robots at random coords
   //create header file for main
   //move allocating memory to function
   //fix [y][x] and (..., x, y) problem
   //fix robotName issue
   //for int functions check msg
   //start moving the robots...
+  //create destructors
 //TODO  
