@@ -31,12 +31,16 @@ int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix);
 void showLevelInfo(Field** matrix);
 int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord);
-int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
+
 //adds 1 robot in the already created matrix and creates a Robot object 
-int createRobots(Field** matrix, Robots* robot, int robotNum);
+int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
 //calling addRobotToMatrix for each robot, manual or random coords
-int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
+int createRobots(Field** matrix, Robots* robot, int robotNum);
+//finds all 4 possible movements and checks wheather some of them are known wall, then calls moveRobot with one of directions
+int prepareMove(Field** matrix, Robots* robot, int counter);
 //if it's not wall, move robot - in matrix and robot class, also logging old coords
+int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
+
 
 //*-----------------------------------------------------------------------------------
 //* when calling matrix coords its matrix[y][x], but we call functions like (..., x, y)
@@ -114,13 +118,17 @@ int main()
 
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
+  
+  gl::displayMessage("Testing prepareMove:\n");
+  prepareMove(lvlMatrix, Robot, 0);
+  displayLevel(lvlMatrix);
   //showLevelInfo(lvlMatrix);
 
-  moveRobot(lvlMatrix, Robot, 0, 0, 0);
+  //moveRobot(lvlMatrix, Robot, 0, 0, 0);
   //moveRobot(lvlMatrix, Robot, 0, 1, 0);
-  displayLevel(lvlMatrix);
-  Robot[0].printInfo();
-  Robot[0].printMovmentHistory();
+  //displayLevel(lvlMatrix);
+  //Robot[0].printInfo();
+  //Robot[0].printMovmentHistory();
 
   return 0;
 }
@@ -341,6 +349,8 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   bool manual_input = false;
   char input = ' ';
 
+  srand(time(NULL));
+
   std::cout<<std::endl; //make gl::newLine
   gl::displayMessage("Would you like to insert them manually (y/n):");
   std::cin>>input;
@@ -352,7 +362,6 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   //*random option
   if (!manual_input)
   {
-    srand(time(NULL));
 
     for (counter=0; counter<robotNum; counter++)
     {
@@ -416,30 +425,94 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   return SUCCESS;
 }
 
+int prepareMove(Field** matrix, Robots* robot, int counter)
+{
+  int directions[4][2] = {{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}};
+  int current_pos[2];
+  int rand_choice = -1;
+  current_pos[0] = robot[counter].coords[1];
+  current_pos[1] = robot[counter].coords[0];
+
+  //down
+  if(!(matrix[(current_pos[0] + 1)][current_pos[1]].getIsWall()))
+  {
+    directions[0][0] = (current_pos[0] + 1);
+    directions[0][1] = (current_pos[1]);
+  }
+  else
+  {
+    robot[counter].foundNewWall(current_pos[0] + 1, current_pos[1]);
+  }
+
+  //right
+  if(!(matrix[(current_pos[0])][current_pos[1] + 1].getIsWall()))
+  {
+    directions[1][0] = (current_pos[0]);
+    directions[1][1] = (current_pos[1] + 1);
+  }
+  else
+  {
+    robot[counter].foundNewWall(current_pos[0], current_pos[1] + 1);
+  }
+
+  //up
+  if(!(matrix[(current_pos[0] - 1)][current_pos[1]].getIsWall()))
+  {
+    directions[2][0] = (current_pos[0] - 1);
+    directions[2][1] = (current_pos[1]);
+  }
+  else
+  {
+    robot[counter].foundNewWall(current_pos[0] - 1, current_pos[1]);
+  }
+
+  //left
+  if(!(matrix[(current_pos[0])][current_pos[1] - 1].getIsWall()))
+  {
+    directions[3][0] = (current_pos[0]);
+    directions[3][1] = (current_pos[1] - 1);
+  }
+  else
+  {
+    robot[counter].foundNewWall(current_pos[0], current_pos[1] - 1);
+  }
+
+  //just for testing
+  // for(auto dir : directions)
+  // {
+  //   std::cout<<"x: " << dir[0] << " y: " << dir[1] << std::endl;
+  // }
+  
+  do
+  {
+    rand_choice = rand()%4; //0, 1, 2, 3
+
+  }while(directions[rand_choice][0] == -1); //it doesn't choose ones with wall
+
+  gl::displayMessage("New cords!");
+  gl::displayMessageInt("x: ", directions[rand_choice][0]);
+  gl::displayMessageInt("y: ", directions[rand_choice][1]); 
+
+  moveRobot(matrix, robot, directions[rand_choice][0], directions[rand_choice][1], counter);
+
+  return SUCCESS;
+}
+
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter)
 {
   if ((matrix == nullptr) || (robot == nullptr)){
     return MEMORY_ALLOC_ERROR;
   }
 
-  //if new coords are wall - log and cancel
-  if (matrix[coord_y][coord_x].getIsWall())
-  {
-    gl::displayMessage("zid");
-    robot[counter].foundNewWall(coord_x, coord_y);
-
-    return SUCCESS;
-  }
-
-  int robotCoord_x = robot[counter].coords[0];
-  int robotCoord_y = robot[counter].coords[1];
+  int robotCoord_x = robot[counter].coords[1];
+  int robotCoord_y = robot[counter].coords[0];
   //these are the old robot coords
   //new coords are coord_x and coord_y
 
   robot[counter].newCoords(coord_x, coord_y);
   //setting new coords in robot object
 
-  matrix[robotCoord_y][robotCoord_x].swapObj(matrix[coord_y][coord_x]);
+  matrix[robotCoord_x][robotCoord_y].swapObj(matrix[coord_x][coord_y]);
   //swapping objects in matrix
 
   return SUCCESS;
@@ -450,6 +523,9 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
   //create header file for main
   //move allocating memory to function
   //fix [y][x] and (..., x, y) problem
+  //!update prepareMove to take into account previous moves?
+  //!check whether knownWalls actually stores them correctlly
+  //// add prepareMove for robot which calls moveRobot
   //fix robotName issue
   //for int functions check msg
   //start moving the robots...
