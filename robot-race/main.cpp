@@ -42,11 +42,6 @@ int prepareMove(Field** matrix, Robots* robot, int counter);
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
 
 
-//*-----------------------------------------------------------------------------------
-//* when calling matrix coords its matrix[y][x], but we call functions like (..., x, y)
-//* we should try fixing this so that is allways x,y  
-//*-----------------------------------------------------------------------------------
-
 int main()
 {
   std::string data;
@@ -73,10 +68,11 @@ int main()
 
   //!this needs to be a seperate function
   //*allocating matrix
-  lvlMatrix = new Field*[matH];
-  for (int i = 0; i<matH; ++i)
+  lvlMatrix = new Field*[matW];
+
+  for (int i = 0; i<matW; ++i)
   {
-    lvlMatrix[i] = new Field[matW];
+    lvlMatrix[i] = new Field[matH];
 
     if (lvlMatrix[i] == nullptr)
     {
@@ -112,7 +108,7 @@ int main()
   levelToMatrix(data, lvlMatrix);
   gl::displayMessage("Printing the matrix after loading the level into it");
   displayLevel(lvlMatrix);
-  
+  showLevelInfo(lvlMatrix);
 
   createRobots(lvlMatrix, Robot, robotNum);
 
@@ -129,6 +125,7 @@ int main()
   //displayLevel(lvlMatrix);
   //Robot[0].printInfo();
   //Robot[0].printMovmentHistory();
+
 
   return 0;
 }
@@ -149,7 +146,7 @@ void showLevelInfo(Field** matrix)
   {
     for(int i = 0; i < width; i++)
     {
-      curr_symbol = matrix[j][i].getSymbol();
+      curr_symbol = matrix[i][j].getSymbol();
       for(auto robot : robotNames)
       {
         if(robot == curr_symbol)
@@ -181,7 +178,7 @@ void displayLevel(Field** matrix)
   {
     for(int i = 0; i <Field::matrixWidth; i++)
     {
-      std::cout<< matrix[j][i].getSymbol();
+      std::cout<< matrix[i][j].getSymbol();
     }
     std::cout<<std::endl;	
   }
@@ -193,13 +190,13 @@ int levelToMatrix(const std::string levelStr, Field** matrix)
   int strW = 0, strH = 0;
   getLevelSize(levelStr, strW, strH);
 
-  
+  int a = -2;
   //inserting chars into matrix
   for(int j = 0; j < strH; j++)
   {
-    for(int i = 0; i < strW; i += 2)
+    for(int i = 0; i < strW; i+=2)
     {
-      matrix[j][i/2] = Field(levelStr[(strW*j)+i], j, i/2);
+      matrix[i/2][j] = Field(levelStr[a+=2], i/2, j);
     }
   }
 
@@ -238,6 +235,8 @@ int getMatrixSize(const std::string levelStr, int& matW, int& matH)
 
   matW = a/2;
   matH = b;
+  //gl::displayMessageInt("w: ", matW);
+  //gl::displayMessageInt("h: ", matH);
 
   return SUCCESS;
 }
@@ -289,7 +288,7 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, in
 
   char symbol = robotNames[counter]; // A B C or D
 
-  matrix[coord_y][coord_x].createRobot(symbol); // in matrix swapping an _ with robot symbol
+  matrix[coord_x][coord_y].createRobot(symbol); // in matrix swapping an _ with robot symbol
 
   robot[counter] = Robots(symbol, coord_x, coord_y); // new object in the Robots class
 
@@ -309,11 +308,11 @@ int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
     not_occupied = true;
     in_level = true;
 
-    x_coord = 1 + rand()%(matH - 1);
-    y_coord = 1 + rand()%(matW - 1);
+    x_coord = 1 + rand()%(matW - 1);
+    y_coord = 1 + rand()%(matH - 1);
 
     //this shouldn't ever happen but just to be sure for now
-    if((x_coord <= 0 || x_coord >= matH) || (y_coord <= 0 || y_coord >= matW))
+    if((x_coord <= 0 || x_coord >= matW) || (y_coord <= 0 || y_coord >= matH))
     {
       in_level = false;
       //gl::displayMessage("Out of bounds!");
@@ -430,8 +429,8 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   int directions[4][2] = {{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}};
   int current_pos[2];
   int rand_choice = -1;
-  current_pos[0] = robot[counter].coords[1];
-  current_pos[1] = robot[counter].coords[0];
+  current_pos[0] = robot[counter].coords[0];
+  current_pos[1] = robot[counter].coords[1];
 
   //down
   if(!(matrix[(current_pos[0] + 1)][current_pos[1]].getIsWall()))
@@ -504,8 +503,8 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
     return MEMORY_ALLOC_ERROR;
   }
 
-  int robotCoord_x = robot[counter].coords[1];
-  int robotCoord_y = robot[counter].coords[0];
+  int robotCoord_x = robot[counter].coords[0];
+  int robotCoord_y = robot[counter].coords[1];
   //these are the old robot coords
   //new coords are coord_x and coord_y
 
@@ -522,7 +521,6 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
   //pb add comments to your functions
   //create header file for main
   //move allocating memory to function
-  //fix [y][x] and (..., x, y) problem
   //!update prepareMove to take into account previous moves?
   //!check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
