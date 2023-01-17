@@ -27,11 +27,14 @@ int levelLoad(std::string fileName, std::string& data);
 int levelToMatrix(std::string levelStr, Field** matrix);
 int getLevelSize(const std::string levelStr, int& width, int& height);
 int getMatrixSize(const std::string levelStr, int& matW, int& matH);
+Field** allocateMatrix(int matW, int matH);
+//returns dynamically allocated 2D array of Field objects
+Robots* allocateRobots(int& robotNum);
+//returns dynamically allocated 1D array of Robots objects
 int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix);
 void showLevelInfo(Field** matrix);
 int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord);
-
 //adds 1 robot in the already created matrix and creates a Robot object 
 int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
 //calling addRobotToMatrix for each robot, manual or random coords
@@ -48,7 +51,6 @@ int main()
   std::string levelName;
   Field** lvlMatrix = nullptr;
   Robots* Robot = nullptr;
-  Robot = new Robots[4];
   int matW = 0, matH = 0;
   int check_msg = 0;
   int robotNum = 0;
@@ -66,43 +68,9 @@ int main()
   getMatrixSize(data, matW, matH);
   // check_msg = createMatrix(lvlMatrix, matW, matH);
 
-  //!this needs to be a seperate function
-  //*allocating matrix
-  lvlMatrix = new Field*[matW];
-
-  for (int i = 0; i<matW; ++i)
-  {
-    lvlMatrix[i] = new Field[matH];
-
-    if (lvlMatrix[i] == nullptr)
-    {
-      check_msg =  MEMORY_ALLOC_ERROR;
-    }
-  }
-
-  if (lvlMatrix == nullptr)
-  {
-    check_msg = MEMORY_ALLOC_ERROR;
-  }
-
-  if(check_msg != SUCCESS)
-  {
-    gl::displayMessage("Memory failed to allocate");
-    return MEMORY_ALLOC_ERROR;
-  }
-  //!-------------------
-
-
-  //!this needs to be a seperate function
-  //*allocating robot
-  while ((robotNum < 1) || (robotNum > MAX_ROBOTS))
-  {
-    gl::displayMessage("enter number of robots (max 4):");
-    std::cin>> robotNum; 
-  }
-  Robot = new Robots[robotNum];
-  gl::displayMessage("");
-  //!-------------------
+  //allocating memory
+  lvlMatrix = allocateMatrix(matW, matH);
+  Robot = allocateRobots(robotNum);
 
   
   levelToMatrix(data, lvlMatrix);
@@ -129,6 +97,58 @@ int main()
 
   return 0;
 }
+
+Robots* allocateRobots(int &robotNum)
+{
+  Robots* Robot = nullptr;
+
+  while ((robotNum < 1) || (robotNum > MAX_ROBOTS))
+  {
+    gl::displayMessage("enter number of robots (max 4):");
+    std::cin>> robotNum; 
+  }
+  Robot = new Robots[robotNum];
+  
+  if (Robot == nullptr)
+  {
+    gl::displayMessage("Memory failed to allocate - Robots");
+  }
+ 
+  gl::displayMessage("");
+
+  return Robot;
+}
+
+
+Field** allocateMatrix(int matW, int matH)
+{
+  Field** lvlMatrix = nullptr;
+  int check_msg = SUCCESS;
+  lvlMatrix = new Field*[matW];
+
+  for (int i = 0; i<matW; ++i)
+  {
+    lvlMatrix[i] = new Field[matH];
+
+    if (lvlMatrix[i] == nullptr)
+    {
+      check_msg =  MEMORY_ALLOC_ERROR;
+    }
+  }
+
+  if (lvlMatrix == nullptr)
+  {
+    check_msg = MEMORY_ALLOC_ERROR;
+  }
+
+  if(check_msg != SUCCESS)
+  {
+    gl::displayMessage("Memory failed to allocate - Field");
+  }
+
+  return lvlMatrix;
+}
+
 
 void showLevelInfo(Field** matrix)
 {
@@ -295,6 +315,7 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, in
   return SUCCESS;
 }
 
+
 int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
 {
   bool not_occupied;
@@ -335,6 +356,7 @@ int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
 
   return SUCCESS;
 }
+
 
 int createRobots(Field** matrix, Robots* robot, int robotNum)
 {
@@ -424,6 +446,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
   return SUCCESS;
 }
 
+
 int prepareMove(Field** matrix, Robots* robot, int counter)
 {
   int directions[4][2] = {{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}};
@@ -497,6 +520,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   return SUCCESS;
 }
 
+
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter)
 {
   if ((matrix == nullptr) || (robot == nullptr)){
@@ -520,7 +544,6 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
 //TODO
   //pb add comments to your functions
   //create header file for main
-  //move allocating memory to function
   //!update prepareMove to take into account previous moves?
   //!check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
