@@ -43,7 +43,8 @@ int createRobots(Field** matrix, Robots* robot, int robotNum);
 int prepareMove(Field** matrix, Robots* robot, int counter);
 //if it's not wall, move robot - in matrix and robot class, also logging old coords
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
-
+//calls prepareMove for each robot
+int moveRobots(Field** matrix, Robots* robot, int robotNum);
 
 int main()
 {
@@ -84,8 +85,10 @@ int main()
   displayLevel(lvlMatrix);
   
   gl::displayMessage("Testing prepareMove:\n");
-  prepareMove(lvlMatrix, Robot, 0);
+  moveRobots(lvlMatrix, Robot, robotNum);
+
   displayLevel(lvlMatrix);
+
   //showLevelInfo(lvlMatrix);
 
   //moveRobot(lvlMatrix, Robot, 0, 0, 0);
@@ -97,6 +100,17 @@ int main()
 
   return 0;
 }
+
+//function that calls prepareMove for each robot
+int moveRobots(Field** matrix, Robots* robot, int robotNum)
+{
+  for(int i = 0; i < robotNum; i++)
+  {
+    prepareMove(matrix, robot, i);
+  }
+  return SUCCESS;
+}
+
 
 Robots* allocateRobots(int &robotNum)
 {
@@ -351,8 +365,6 @@ int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
 
   } while(!not_occupied || !in_level);
   
-  
-
 
   return SUCCESS;
 }
@@ -389,7 +401,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
       generateRandomCoords(matrix, coords_x, coords_y);
 
       gl::displayMessageInt("Adding robot ", counter+1);
-      addRobotToMatrix(matrix, robot, coords_y, coords_x, counter);
+      addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
     }
 
 
