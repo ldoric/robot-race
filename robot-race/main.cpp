@@ -5,6 +5,9 @@
 #include <string.h>
 #include <iterator>
 #include <list>
+#include <cstdlib>
+#include <Windows.h>
+
 
 //gmaz lib
 #include "includes/g_math.h"
@@ -12,7 +15,6 @@
 #include "includes/g_log.h"
 
 //classes
-//#include "level.h"
 #include "classes/level.h"
 #include "classes/robot.h"
 
@@ -21,6 +23,7 @@
 #define SUCCESS (0)
 #define MEMORY_ALLOC_ERROR (-1)
 #define MAX_ROBOTS (4)
+#define SEARCH_FAIL (-1)
 
 //function declarations
 int levelLoad(std::string fileName, std::string& data);
@@ -45,6 +48,10 @@ int prepareMove(Field** matrix, Robots* robot, int counter);
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
 //calls prepareMove for each robot
 int moveRobots(Field** matrix, Robots* robot, int robotNum);
+//function that gets $ coords
+int getEndCoords(Field** matrix, int& a, int& b);
+//mainloop function
+int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
 
 int main()
 {
@@ -55,6 +62,7 @@ int main()
   int matW = 0, matH = 0;
   int check_msg = 0;
   int robotNum = 0;
+  int end_x = 0, end_y = 0;
 
   gl::displayMessage("Enter level name (txt file): ");
   std::cin>>levelName;
@@ -66,40 +74,86 @@ int main()
     return FILE_READ_ERROR;
   }
 
+  //getting level size
   getMatrixSize(data, matW, matH);
-  // check_msg = createMatrix(lvlMatrix, matW, matH);
 
   //allocating memory
   lvlMatrix = allocateMatrix(matW, matH);
   Robot = allocateRobots(robotNum);
 
-  
+  //loading level into matrix
   levelToMatrix(data, lvlMatrix);
   gl::displayMessage("Printing the matrix after loading the level into it");
   displayLevel(lvlMatrix);
   showLevelInfo(lvlMatrix);
 
-  createRobots(lvlMatrix, Robot, robotNum);
+  //get end coords
+  getEndCoords(lvlMatrix, end_x, end_y);
 
+  //creating robots
+  createRobots(lvlMatrix, Robot, robotNum);
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
   
-  gl::displayMessage("Testing prepareMove:\n");
-  moveRobots(lvlMatrix, Robot, robotNum);
+  //Mainloop(to be implemented)
+  gl::displayMessage("Mainloop:\n");
 
-  displayLevel(lvlMatrix);
+  //testing mainloop
+  mainLoop(lvlMatrix, Robot, robotNum, end_x, end_y);
 
-  //showLevelInfo(lvlMatrix);
-
-  //moveRobot(lvlMatrix, Robot, 0, 0, 0);
-  //moveRobot(lvlMatrix, Robot, 0, 1, 0);
-  //displayLevel(lvlMatrix);
-  //Robot[0].printInfo();
-  //Robot[0].printMovmentHistory();
-
+  
 
   return 0;
 }
+
+//mainloop function (only testing for now)
+int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
+{
+  for(int i = 0; i < 50; i++) //*only 50 moves for now and quits when any robot reaches $ (to be changed)
+  {
+    gl::displayMessage("Move " + std::to_string(i+1) + ":\n");
+    moveRobots(matrix, robot, robotNum);
+    displayLevel(matrix);
+
+    //check if any robot is on $ coords
+    for(int j = 0; j < robotNum; j++)
+    {
+      if((robot[j].coords[0] == end_x) && (robot[j].coords[1] == end_y))
+      {
+        gl::displayMessage("Robot " + std::to_string(j+1) + " has reached the end!");
+        return 0;
+      }
+    }
+    
+    //add time delay for better visualisation
+    Sleep(1000);
+
+  }
+  return SUCCESS;
+}
+
+
+//function that gets $ coords and returns them as x and y
+int getEndCoords(Field** matrix, int& x, int& y)
+{
+  int width = Field::matrixWidth;
+  int height = Field::matrixHeight;
+
+  for(int i = 0; i < width; i++)
+  {
+    for(int j = 0; j < height; j++)
+    {
+      if(matrix[i][j].getSymbol() == '$')
+      {
+        x = i;
+        y = j;
+        return SUCCESS;
+      }
+    }
+  }
+  return SEARCH_FAIL;
+}
+
 
 //function that calls prepareMove for each robot
 int moveRobots(Field** matrix, Robots* robot, int robotNum)
@@ -554,13 +608,14 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
 }
 
 //TODO
-  //pb add comments to your functions
-  //create header file for main
-  //!update prepareMove to take into account previous moves?
-  //!check whether knownWalls actually stores them correctlly
+  //! BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE
+  //*1. in some way avoid robots spawning too close to finish/each other
+  //*2. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
+  //*3. implement actual mainloop with while which ends when all robots finish or too many steps
+  //*update prepareMove to take into account previous moves?
+  //*check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
   //fix robotName issue
   //for int functions check msg
-  //start moving the robots...
   //create destructors
 //TODO  
