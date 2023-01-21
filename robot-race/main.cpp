@@ -30,18 +30,18 @@ int levelLoad(std::string fileName, std::string& data);
 int levelToMatrix(std::string levelStr, Field** matrix);
 int getLevelSize(const std::string levelStr, int& width, int& height);
 int getMatrixSize(const std::string levelStr, int& matW, int& matH);
-Field** allocateMatrix(int matW, int matH);
 //returns dynamically allocated 2D array of Field objects
-Robots* allocateRobots(int& robotNum);
+Field** allocateMatrix(int matW, int matH);
 //returns dynamically allocated 1D array of Robots objects
+Robots* allocateRobots(int& robotNum);
 int createMatrix(Field** matrix, int matW, int matH);
 void displayLevel(Field** matrix);
 void showLevelInfo(Field** matrix);
-int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord);
+int generateRandomCoords(Field** matrix, Robots* robot, int couter, int& x_coord, int& y_coord);
 //adds 1 robot in the already created matrix and creates a Robot object 
 int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
 //calling addRobotToMatrix for each robot, manual or random coords
-int createRobots(Field** matrix, Robots* robot, int robotNum);
+int createRobots(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
 //finds all 4 possible movements and checks wheather some of them are known wall, then calls moveRobot with one of directions
 int prepareMove(Field** matrix, Robots* robot, int counter);
 //if it's not wall, move robot - in matrix and robot class, also logging old coords
@@ -52,6 +52,10 @@ int moveRobots(Field** matrix, Robots* robot, int robotNum);
 int getEndCoords(Field** matrix, int& a, int& b);
 //mainloop function
 int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
+//gets the distance between coord and end coords
+int getDistanceToEnd(Field** matrix, int x, int y, int end_x, int end_y);
+//gets the distance between coord and robot coords
+int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y);
 
 int main()
 {
@@ -91,7 +95,7 @@ int main()
   getEndCoords(lvlMatrix, end_x, end_y);
 
   //creating robots
-  createRobots(lvlMatrix, Robot, robotNum);
+  createRobots(lvlMatrix, Robot, robotNum, end_x, end_y);
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
   
@@ -109,7 +113,7 @@ int main()
 //mainloop function (only testing for now)
 int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
 {
-  for(int i = 0; i < 50; i++) //*only 50 moves for now and quits when any robot reaches $ (to be changed)
+  for(int i = 0; i < 80; i++) //*only 80 moves for now and quits when any robot reaches $ (to be changed)
   {
     gl::displayMessage("Move " + std::to_string(i+1) + ":\n");
     moveRobots(matrix, robot, robotNum);
@@ -383,11 +387,29 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, in
   return SUCCESS;
 }
 
+//gets the distance between coord and end coords
+int getDistanceToEnd(Field** matrix, int x, int y, int end_x, int end_y)
+{
+  int distance = 0;
+  distance = abs(x - end_x) + abs(y - end_y);
 
-int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
+  return distance;
+}
+
+//gets the distance between coord and robot coords
+int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y)
+{
+  int distance = 0;
+  distance = abs(x - robot_x) + abs(y - robot_y);
+
+  return distance;
+}
+
+int generateRandomCoords(Field** matrix, Robots* robot, int counter, int& x_coord, int& y_coord, int end_x, int end_y)
 {
   bool not_occupied;
   bool in_level;
+  bool too_close;
 
   const int matH = Field::matrixHeight;
   const int matW = Field::matrixWidth;
@@ -396,6 +418,7 @@ int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
   {
     not_occupied = true;
     in_level = true;
+    too_close = true;
 
     x_coord = 1 + rand()%(matW - 1);
     y_coord = 1 + rand()%(matH - 1);
@@ -413,18 +436,28 @@ int generateRandomCoords(Field** matrix, int& x_coord, int& y_coord)
       //gl::displayMessage("Tile not empty!");
     } 
 
-    else
-    {;} 
+    else if(getDistanceToEnd(matrix, x_coord, y_coord, end_x, end_y) < 6)
+    {
+      too_close = false;
+    }
+
+    for(int i = 0; i < counter; i++)
+    {
+      if(getDistanceToRobot(matrix, x_coord, y_coord, robot[i].coords[0], robot[i].coords[1]) < 2)
+      {
+        too_close = false;
+      }
+    }
 
 
-  } while(!not_occupied || !in_level);
+  } while(!not_occupied || !in_level || !too_close);
   
 
   return SUCCESS;
 }
 
 
-int createRobots(Field** matrix, Robots* robot, int robotNum)
+int createRobots(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
 {
   if ((matrix == nullptr) || (robot == nullptr)){
     return MEMORY_ALLOC_ERROR;
@@ -452,7 +485,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum)
 
     for (counter=0; counter<robotNum; counter++)
     {
-      generateRandomCoords(matrix, coords_x, coords_y);
+      generateRandomCoords(matrix, robot, counter, coords_x, coords_y, end_x, end_y);
 
       gl::displayMessageInt("Adding robot ", counter+1);
       addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
@@ -633,10 +666,10 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
 }
 
 //TODO
-  //! BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE
-  //*1. in some way avoid robots spawning too close to finish/each other
-  //*2. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
-  //*3. implement actual mainloop with while which ends when all robots finish or too many steps
+  //// BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE  - DONE
+  //// in some way avoid robots spawning too close to finish/each other - DONE
+  //*1. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
+  //*2. implement actual mainloop with while which ends when all robots finish or too many steps
   //*update prepareMove to take into account previous moves?
   //*check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot

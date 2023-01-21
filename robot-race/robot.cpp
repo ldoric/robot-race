@@ -5,7 +5,7 @@ Robots::Robots()
 {
   symbol = '?';
 
-  coords[0] = 0, coords[1] = 1;
+  coords[0] = -2, coords[1] = -2;
 }
 
 Robots::Robots(char newSymbol, int x_coord, int y_coord)
