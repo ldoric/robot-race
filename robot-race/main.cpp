@@ -615,7 +615,7 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
   //*update prepareMove to take into account previous moves?
   //*check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
-  //fix robotName issue
+  ////fix robotName issue
   //for int functions check msg
   //create destructors
 //TODO  

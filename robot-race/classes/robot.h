@@ -3,11 +3,7 @@
 #include <iterator>
 #include <list>
 
-//*__________________
-/* same as robotNames, couldnt figure out how to declare this
-only once as it gives an error because we include both header
-files in main */ 
-//*_________________
+
 const char robotSymbols[4] = {'A', 'B', 'C', 'D'};
 
 class Robots{
@@ -16,7 +12,6 @@ class Robots{
     char symbol;
     std::list<int*> oldCoords;
     std::list<int*> knownWalls;   
-    //int coords[2];
 
   public:
     int coords[2];
