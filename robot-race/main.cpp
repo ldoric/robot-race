@@ -524,19 +524,35 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   //down
   if(!(matrix[(current_pos[0] + 1)][current_pos[1]].getIsWall()))
   {
-    directions[0][0] = (current_pos[0] + 1);
-    directions[0][1] = (current_pos[1]);
+    if(!(matrix[(current_pos[0] + 1)][current_pos[1]].getIsRobot()))
+    {
+      directions[0][0] = (current_pos[0] + 1);
+      directions[0][1] = (current_pos[1]);
+    }
+    else
+    {
+      gl::displayMessage("Hit robot!");
+    }
+
   }
   else
   {
     robot[counter].foundNewWall(current_pos[0] + 1, current_pos[1]);
   }
 
+
   //right
   if(!(matrix[(current_pos[0])][current_pos[1] + 1].getIsWall()))
   {
-    directions[1][0] = (current_pos[0]);
-    directions[1][1] = (current_pos[1] + 1);
+    if(!(matrix[(current_pos[0])][current_pos[1]+1].getIsRobot()))
+    {
+      directions[1][0] = (current_pos[0]);
+      directions[1][1] = (current_pos[1]+1);
+    }
+    else
+    {
+      gl::displayMessage("Hit robot!");
+    }
   }
   else
   {
@@ -546,8 +562,15 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   //up
   if(!(matrix[(current_pos[0] - 1)][current_pos[1]].getIsWall()))
   {
-    directions[2][0] = (current_pos[0] - 1);
-    directions[2][1] = (current_pos[1]);
+    if(!(matrix[(current_pos[0] - 1)][current_pos[1]].getIsRobot()))
+    {
+      directions[2][0] = (current_pos[0] - 1);
+      directions[2][1] = (current_pos[1]);
+    }
+    else
+    {
+      gl::displayMessage("Hit robot!");
+    }
   }
   else
   {
@@ -557,20 +580,22 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   //left
   if(!(matrix[(current_pos[0])][current_pos[1] - 1].getIsWall()))
   {
-    directions[3][0] = (current_pos[0]);
-    directions[3][1] = (current_pos[1] - 1);
+    if(!(matrix[(current_pos[0])][current_pos[1]-1].getIsRobot()))
+    {
+      directions[3][0] = (current_pos[0]);
+      directions[3][1] = (current_pos[1]-1);
+    }
+    else
+    {
+      gl::displayMessage("Hit robot!");
+    }
   }
   else
   {
     robot[counter].foundNewWall(current_pos[0], current_pos[1] - 1);
   }
-
-  //just for testing
-  // for(auto dir : directions)
-  // {
-  //   std::cout<<"x: " << dir[0] << " y: " << dir[1] << std::endl;
-  // }
   
+
   do
   {
     rand_choice = rand()%4; //0, 1, 2, 3
