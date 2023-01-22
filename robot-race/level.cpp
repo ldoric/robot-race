@@ -133,6 +133,13 @@ void Field::createRobot(char robotSymbol)
   */
 }
 
+void Field::beEmpty()
+{
+  symbol = '_';
+  isRobot = false;
+  isEmpty = true;
+}
+
 int Field::matrixWidth = 0;
 int Field::matrixHeight = 0;
 

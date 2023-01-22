@@ -24,6 +24,7 @@
 #define MEMORY_ALLOC_ERROR (-1)
 #define MAX_ROBOTS (4)
 #define SEARCH_FAIL (-1)
+#define MAX_MOVES (80)
 
 //function declarations
 int levelLoad(std::string fileName, std::string& data);
@@ -56,6 +57,8 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
 int getDistanceToEnd(Field** matrix, int x, int y, int end_x, int end_y);
 //gets the distance between coord and robot coords
 int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y);
+//print in how manny move robots reached the end 
+int showResults(Robots* robot, int RobotNum);
 
 int main()
 {
@@ -105,16 +108,21 @@ int main()
   //testing mainloop
   mainLoop(lvlMatrix, Robot, robotNum, end_x, end_y);
 
+  showResults(Robot, robotNum);
+
   
 
   return 0;
 }
 
-//mainloop function (only testing for now)
+//mainloop function
 int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
 {
-  for(int i = 0; i < 80; i++) //*only 80 moves for now and quits when any robot reaches $ (to be changed)
+  bool allAtEnd; //if true after for loops -> return SUCCESS 
+
+  for(int i = 0; i < MAX_MOVES; i++) //*only 80 moves for now and quits when any robot reaches $ (to be changed)
   {
+    allAtEnd = true;
     gl::displayMessage("Move " + std::to_string(i+1) + ":\n");
     moveRobots(matrix, robot, robotNum);
     displayLevel(matrix);
@@ -122,17 +130,25 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
     //check if any robot is on $ coords
     for(int j = 0; j < robotNum; j++)
     {
-      if((robot[j].coords[0] == end_x) && (robot[j].coords[1] == end_y))
+      if( !(robot[j].getIsAtEnd()) )
       {
-        gl::displayMessage("Robot " + std::to_string(j+1) + " has reached the end!");
-        return 0;
+        //add time delay for better visualisation
+        Sleep(200);
+        allAtEnd = false;
+        break;
       }
     }
-    
-    //add time delay for better visualisation
-    Sleep(1000);
 
+    if (!allAtEnd)
+    {
+      continue;
+    }
+
+    gl::displayMessage("All robots reached the end!!");
+    return SUCCESS;
   }
+
+  gl::displayMessage("Game Over - Max Moves reached!!");
   return SUCCESS;
 }
 
@@ -164,7 +180,10 @@ int moveRobots(Field** matrix, Robots* robot, int robotNum)
 {
   for(int i = 0; i < robotNum; i++)
   {
-    prepareMove(matrix, robot, i);
+    if( !(robot[i].getIsAtEnd()) )
+    {
+      prepareMove(matrix, robot, i);
+    }
   }
   return SUCCESS;
 }
@@ -659,21 +678,56 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
   robot[counter].newCoords(coord_x, coord_y);
   //setting new coords in robot object
 
-  matrix[robotCoord_x][robotCoord_y].swapObj(matrix[coord_x][coord_y]);
-  //swapping objects in matrix
+  //if at end don't swapObj - just erase robot from field 
+  if ( !(matrix[coord_x][coord_y].getIsEnd()) )
+  { 
+    matrix[robotCoord_x][robotCoord_y].swapObj(matrix[coord_x][coord_y]);
+    //swapping objects in matrix
+  }
+  else
+  {
+    matrix[robotCoord_x][robotCoord_y].beEmpty();
+    robot[counter].setAtEnd();
+    std::cout << "Robot " << robotNames[counter] << " has reached the end!" << std::endl;
 
+  }
+
+
+  return SUCCESS;
+}
+
+int showResults(Robots* robot, int robotNum)
+{
+  gl::displayMessage("\n=====>RESULTS<=====\n");
+
+  for(int i = 0; i < robotNum; i++)
+  {
+    if( robot[i].getIsAtEnd() )
+    {
+      std::cout << "Robot " << robotNames[i] << " has reached the end in " << robot[i].getMoves() << " moves!"<<std::endl;
+    }
+    else
+    {
+      std::cout << "Robot " << robotNames[i] << " didn't reached the end!" << std::endl;
+    }
+  }
+
+  gl::displayMessage("\n===================\n");
   return SUCCESS;
 }
 
 //TODO
   //// BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE  - DONE
   //// in some way avoid robots spawning too close to finish/each other - DONE
-  //*1. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
-  //*2. implement actual mainloop with while which ends when all robots finish or too many steps
+  //// 1. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
+  //// 2. implement actual mainloop with while which ends when all robots finish or too many steps
+  //* BUG -if robots are to close it just breaks
+  //* does check if too close to end affects manual input? 
   //*update prepareMove to take into account previous moves?
   //*check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
   ////fix robotName issue
-  //for int functions check msg
-  //create destructors
+  //*for int functions check msg
+  //*create destructors
+  //*create list with all outputs? that way we can clear screen cmd - more clean and at end have watch highliths/replay option
 //TODO  

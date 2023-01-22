@@ -5,7 +5,11 @@ Robots::Robots()
 {
   symbol = '?';
 
+  isAtEnd = false;
+
   coords[0] = -2, coords[1] = -2;
+
+  moves = 0;
 }
 
 Robots::Robots(char newSymbol, int x_coord, int y_coord)
@@ -13,6 +17,8 @@ Robots::Robots(char newSymbol, int x_coord, int y_coord)
   coords[0] = x_coord;
   coords[1] = y_coord;
   symbol = '?';
+  isAtEnd = false;
+  moves = 0;
 
   for (auto symb : robotSymbols)
   {
@@ -29,6 +35,8 @@ Robots::Robots(Robots &secondObj)
   symbol = secondObj.symbol;
   coords[0] = secondObj.coords[0];
   coords[1] = secondObj.coords[1];
+  isAtEnd = secondObj.isAtEnd;
+  moves = 0;
 }
 
 void Robots::newCoords(int x_coord, int y_coord)
@@ -40,6 +48,8 @@ void Robots::newCoords(int x_coord, int y_coord)
   oldCoords.push_back(temp);
   coords[0] = x_coord;
   coords[1] = y_coord;
+
+  moves ++;
 }
 
 void Robots::foundNewWall(int x_coord, int y_coord)
@@ -84,4 +94,19 @@ void Robots::setRobot(char newSymbol, int x_coord, int y_coord)
 void Robots::printInfo()
 {
   std::cout<< "symbol: " << symbol << ", coords: " << coords[0] << " " << coords[1] << std::endl;
+}
+
+void Robots::setAtEnd()
+{
+  isAtEnd = true;
+}
+
+bool Robots::getIsAtEnd()
+{
+  return isAtEnd;
+}
+
+int Robots::getMoves()
+{
+  return moves;
 }

@@ -10,6 +10,8 @@ class Robots{
 
   private:
     char symbol;
+    bool isAtEnd;
+    int moves;
     std::list<int*> oldCoords;
     std::list<int*> knownWalls;   
 
@@ -18,16 +20,23 @@ class Robots{
     Robots();
     Robots(char newSymbol, int x_coord, int y_coord);
     Robots(Robots& secondObj);
-    void newCoords(int x_coord, int y_coord);
     //sets new coords and logs old ones in a list (first coord = first in the list)
+    void newCoords(int x_coord, int y_coord);
+    //can be used(edited version) in robot moving position because its not used when robot is created
     void setRobot(char newSymbol, int x_coord, int y_coord);
-    //can be used(edited version) in robot moving position because its not used when robot is created 
+    //printing symbol and coords 
     void printInfo();
-    //printing symbol and coords
-    void printMovmentHistory();
     //printing movment history
-    void foundNewWall(int x_coord, int y_coord);
+    void printMovmentHistory();
     //adding wall in knownWall list
+    void foundNewWall(int x_coord, int y_coord);
+    //changes isAtEnd to true
+    void setAtEnd();
+    //returns true if at end
+    bool getIsAtEnd();
+    //returns num of moves
+    int getMoves();
+
 
 };
 

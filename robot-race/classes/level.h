@@ -32,6 +32,8 @@ class Field
     bool getIsRobot();
     char getSymbol();
     //returning symbol from these coords
+    void beEmpty();
+    //robot becomes empty field - used when robot comes to end
 
 };
 
