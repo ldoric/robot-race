@@ -13,7 +13,7 @@ class Robots{
     bool isAtEnd;
     int moves;
     std::list<int*> oldCoords;
-    std::list<int*> knownWalls;   
+    std::list<int*> knownWalls; 
 
   public:
     int coords[2];
@@ -36,6 +36,8 @@ class Robots{
     bool getIsAtEnd();
     //returns num of moves
     int getMoves();
+    //gets previous coords
+    int getOldCoords(int& x_coord, int& y_coord);
 
 
 };

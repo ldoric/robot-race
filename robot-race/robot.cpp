@@ -110,3 +110,17 @@ int Robots::getMoves()
 {
   return moves;
 }
+
+int Robots::getOldCoords(int &x_coord, int &y_coord)
+{
+  if (oldCoords.size() == 0)
+  {
+    return 0;
+  }
+  else
+  {
+    x_coord = oldCoords.back()[0];
+    y_coord = oldCoords.back()[1];
+    return EXIT_SUCCESS;
+  }
+}

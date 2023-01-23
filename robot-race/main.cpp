@@ -24,7 +24,7 @@
 #define MEMORY_ALLOC_ERROR (-1)
 #define MAX_ROBOTS (4)
 #define SEARCH_FAIL (-1)
-#define MAX_MOVES (80)
+#define MAX_MOVES (100)
 
 //function declarations
 int levelLoad(std::string fileName, std::string& data);
@@ -105,7 +105,7 @@ int main()
   mainLoop(lvlMatrix, Robot, robotNum);
 
   showResults(Robot, robotNum);
-
+  
   showReplay(lvlMatrix);
   
 
@@ -117,7 +117,7 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum)
 {
   bool allAtEnd; //if true after for loops -> return SUCCESS 
 
-  for(int i = 0; i < MAX_MOVES; i++) //*only 80 moves for now and quits when any robot reaches $ (to be changed)
+  for(int i = 0; i < MAX_MOVES; i++) //*for now max moves is 200
   {
     allAtEnd = true;
     gl::displayMessage("Move " + std::to_string(i+1) + ":\n");
@@ -130,7 +130,7 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum)
       if( !(robot[j].getIsAtEnd()) )
       {
         //add time delay for better visualisation
-        Sleep(200);
+        Sleep(1200);
         allAtEnd = false;
         break;
       }
@@ -560,6 +560,8 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   int current_pos[2];
   int rand_choice = -1;
   bool possibleMove = false; // if this stays false don't call moveRobot
+  bool sameAsLast = false;
+  int num_of_directions = 0;
   current_pos[0] = robot[counter].coords[0];
   current_pos[1] = robot[counter].coords[1];
 
@@ -571,10 +573,11 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
       directions[0][0] = (current_pos[0] + 1);
       directions[0][1] = (current_pos[1]);
       possibleMove = true;
+      num_of_directions++;
     }
     else
     {
-      gl::displayMessage("Hit robot!");
+      //gl::displayMessage("Hit robot!");
     }
 
   }
@@ -592,10 +595,11 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
       directions[1][0] = (current_pos[0]);
       directions[1][1] = (current_pos[1]+1);
       possibleMove = true;
+      num_of_directions++;
     }
     else
     {
-      gl::displayMessage("Hit robot!");
+      //gl::displayMessage("Hit robot!");
     }
   }
   else
@@ -611,10 +615,11 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
       directions[2][0] = (current_pos[0] - 1);
       directions[2][1] = (current_pos[1]);
       possibleMove = true;
+      num_of_directions++;
     }
     else
     {
-      gl::displayMessage("Hit robot!");
+      //gl::displayMessage("Hit robot!");
     }
   }
   else
@@ -630,10 +635,11 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
       directions[3][0] = (current_pos[0]);
       directions[3][1] = (current_pos[1]-1);
       possibleMove = true;
+      num_of_directions++;
     }
     else
     {
-      gl::displayMessage("Hit robot!");
+      //gl::displayMessage("Hit robot!");
     }
   }
   else
@@ -647,15 +653,34 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     return SUCCESS;
   }
 
+  //if the robot has more than 1 possible move
+  if (num_of_directions > 1)
+  {
+    //get robot previous coords
+    int prev_coords[2];
+    robot[counter].getOldCoords(prev_coords[0], prev_coords[1]);
+
+    //loop through the directions array and if the previous coords are in it set them to -1
+    for (int i = 0; i < 4; i++)
+    {
+      if ((directions[i][0] == prev_coords[0]) && (directions[i][1] == prev_coords[1]))
+      {
+        directions[i][0] = -1;
+        directions[i][1] = -1;
+      }
+    }
+  }
+
   do
   {
     rand_choice = rand()%4; //0, 1, 2, 3
 
-  }while(directions[rand_choice][0] == -1); //it doesn't choose ones with wall
+  }while((directions[rand_choice][0] == -1)); //it doesn't choose ones with wall
 
-  gl::displayMessage("New cords!");
-  gl::displayMessageInt("x: ", directions[rand_choice][0]);
-  gl::displayMessageInt("y: ", directions[rand_choice][1]); 
+  //*uncomment for testing
+  //gl::displayMessage("New cords!");
+  //gl::displayMessageInt("x: ", directions[rand_choice][0]);
+  //gl::displayMessageInt("y: ", directions[rand_choice][1]); 
 
   moveRobot(matrix, robot, directions[rand_choice][0], directions[rand_choice][1], counter);
 
