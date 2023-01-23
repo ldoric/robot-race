@@ -1,5 +1,6 @@
 #include <iostream>
 #include "classes/level.h"
+#include <Windows.h>
 
 
 Field::Field()
@@ -140,6 +141,28 @@ void Field::beEmpty()
   isEmpty = true;
 }
 
+void Field::storeMove(std::string move)
+{
+  moveList.push_back(move);
+}
+
+void Field::replayGame()
+{
+  int i=1; //counter for what move
+  std::cout << "\nGame Replay:" << std::endl;
+  std::cout << "\tpress anything for next move" << std::endl;
+
+  for (auto it = moveList.begin(); it != moveList.end(); ++it)
+  {
+    std::cout << "Move: " << i++ << ":\n" << std::endl;
+    std::cout << *it << std::endl;
+    std::cin.get();
+  }
+  std::cout << "\n";
+}
+
 int Field::matrixWidth = 0;
 int Field::matrixHeight = 0;
+int Field::endCoordX = 0;
+int Field::endCoordY = 0;
 

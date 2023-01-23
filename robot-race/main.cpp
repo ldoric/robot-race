@@ -42,23 +42,23 @@ int generateRandomCoords(Field** matrix, Robots* robot, int couter, int& x_coord
 //adds 1 robot in the already created matrix and creates a Robot object 
 int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter/*uses robotNames to get symbol*/); 
 //calling addRobotToMatrix for each robot, manual or random coords
-int createRobots(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
+int createRobots(Field** matrix, Robots* robot, int robotNum);
 //finds all 4 possible movements and checks wheather some of them are known wall, then calls moveRobot with one of directions
 int prepareMove(Field** matrix, Robots* robot, int counter);
 //if it's not wall, move robot - in matrix and robot class, also logging old coords
 int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int counter);
 //calls prepareMove for each robot
 int moveRobots(Field** matrix, Robots* robot, int robotNum);
-//function that gets $ coords
-int getEndCoords(Field** matrix, int& a, int& b);
 //mainloop function
-int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y);
+int mainLoop(Field** matrix, Robots* robot, int robotNum);
 //gets the distance between coord and end coords
-int getDistanceToEnd(Field** matrix, int x, int y, int end_x, int end_y);
+int getDistanceToEnd(Field** matrix, int x, int y);
 //gets the distance between coord and robot coords
 int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y);
 //print in how manny move robots reached the end 
 int showResults(Robots* robot, int RobotNum);
+//printing every move once again
+int showReplay(Field** matrix);
 
 int main()
 {
@@ -69,8 +69,7 @@ int main()
   int matW = 0, matH = 0;
   int check_msg = 0;
   int robotNum = 0;
-  int end_x = 0, end_y = 0;
-
+ 
   gl::displayMessage("Enter level name (txt file): ");
   std::cin>>levelName;
 
@@ -94,11 +93,8 @@ int main()
   displayLevel(lvlMatrix);
   showLevelInfo(lvlMatrix);
 
-  //get end coords
-  getEndCoords(lvlMatrix, end_x, end_y);
-
   //creating robots
-  createRobots(lvlMatrix, Robot, robotNum, end_x, end_y);
+  createRobots(lvlMatrix, Robot, robotNum);
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
   
@@ -106,17 +102,18 @@ int main()
   gl::displayMessage("Mainloop:\n");
 
   //testing mainloop
-  mainLoop(lvlMatrix, Robot, robotNum, end_x, end_y);
+  mainLoop(lvlMatrix, Robot, robotNum);
 
   showResults(Robot, robotNum);
 
+  showReplay(lvlMatrix);
   
 
   return 0;
 }
 
-//mainloop function
-int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
+
+int mainLoop(Field** matrix, Robots* robot, int robotNum)
 {
   bool allAtEnd; //if true after for loops -> return SUCCESS 
 
@@ -153,29 +150,6 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
 }
 
 
-//function that gets $ coords and returns them as x and y
-int getEndCoords(Field** matrix, int& x, int& y)
-{
-  int width = Field::matrixWidth;
-  int height = Field::matrixHeight;
-
-  for(int i = 0; i < width; i++)
-  {
-    for(int j = 0; j < height; j++)
-    {
-      if(matrix[i][j].getSymbol() == '$')
-      {
-        x = i;
-        y = j;
-        return SUCCESS;
-      }
-    }
-  }
-  return SEARCH_FAIL;
-}
-
-
-//function that calls prepareMove for each robot
 int moveRobots(Field** matrix, Robots* robot, int robotNum)
 {
   for(int i = 0; i < robotNum; i++)
@@ -285,14 +259,21 @@ void showLevelInfo(Field** matrix)
 
 void displayLevel(Field** matrix)
 {
+  std::string level = "";
+
   for(int j = 0; j < Field::matrixHeight; j++)
   {
     for(int i = 0; i <Field::matrixWidth; i++)
     {
-      std::cout<< matrix[i][j].getSymbol();
+      level +=  matrix[i][j].getSymbol();
     }
-    std::cout<<std::endl;	
+    level += "\n";
   }
+
+  std::cout << level << std::endl;
+
+  matrix[Field::endCoordX][Field::endCoordY].storeMove(level); //we store list in end obj
+
 }
 
 
@@ -308,6 +289,13 @@ int levelToMatrix(const std::string levelStr, Field** matrix)
     for(int i = 0; i < strW; i+=2)
     {
       matrix[i/2][j] = Field(levelStr[a+=2], i/2, j);
+
+      if (levelStr[a]=='$')
+      {
+        Field::endCoordX = i/2;
+        Field::endCoordY = j;
+      }
+
     }
   }
 
@@ -406,16 +394,16 @@ int addRobotToMatrix(Field** matrix, Robots* robot, int coord_x, int coord_y, in
   return SUCCESS;
 }
 
-//gets the distance between coord and end coords
-int getDistanceToEnd(Field** matrix, int x, int y, int end_x, int end_y)
+
+int getDistanceToEnd(Field** matrix, int x, int y)
 {
   int distance = 0;
-  distance = abs(x - end_x) + abs(y - end_y);
+  distance = abs(x - Field::endCoordX) + abs(y - Field::endCoordY);
 
   return distance;
 }
 
-//gets the distance between coord and robot coords
+
 int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y)
 {
   int distance = 0;
@@ -424,7 +412,8 @@ int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y)
   return distance;
 }
 
-int generateRandomCoords(Field** matrix, Robots* robot, int counter, int& x_coord, int& y_coord, int end_x, int end_y)
+
+int generateRandomCoords(Field** matrix, Robots* robot, int counter, int& x_coord, int& y_coord)
 {
   bool not_occupied;
   bool in_level;
@@ -455,7 +444,7 @@ int generateRandomCoords(Field** matrix, Robots* robot, int counter, int& x_coor
       //gl::displayMessage("Tile not empty!");
     } 
 
-    else if(getDistanceToEnd(matrix, x_coord, y_coord, end_x, end_y) < 6)
+    else if(getDistanceToEnd(matrix, x_coord, y_coord) < 6)
     {
       too_close = false;
     }
@@ -476,7 +465,7 @@ int generateRandomCoords(Field** matrix, Robots* robot, int counter, int& x_coor
 }
 
 
-int createRobots(Field** matrix, Robots* robot, int robotNum, int end_x, int end_y)
+int createRobots(Field** matrix, Robots* robot, int robotNum)
 {
   if ((matrix == nullptr) || (robot == nullptr)){
     return MEMORY_ALLOC_ERROR;
@@ -504,7 +493,7 @@ int createRobots(Field** matrix, Robots* robot, int robotNum, int end_x, int end
 
     for (counter=0; counter<robotNum; counter++)
     {
-      generateRandomCoords(matrix, robot, counter, coords_x, coords_y, end_x, end_y);
+      generateRandomCoords(matrix, robot, counter, coords_x, coords_y);
 
       gl::displayMessageInt("Adding robot ", counter+1);
       addRobotToMatrix(matrix, robot, coords_x, coords_y, counter);
@@ -570,6 +559,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
   int directions[4][2] = {{-1,-1}, {-1,-1}, {-1,-1}, {-1,-1}};
   int current_pos[2];
   int rand_choice = -1;
+  bool possibleMove = false; // if this stays false don't call moveRobot
   current_pos[0] = robot[counter].coords[0];
   current_pos[1] = robot[counter].coords[1];
 
@@ -580,6 +570,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     {
       directions[0][0] = (current_pos[0] + 1);
       directions[0][1] = (current_pos[1]);
+      possibleMove = true;
     }
     else
     {
@@ -600,6 +591,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     {
       directions[1][0] = (current_pos[0]);
       directions[1][1] = (current_pos[1]+1);
+      possibleMove = true;
     }
     else
     {
@@ -618,6 +610,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     {
       directions[2][0] = (current_pos[0] - 1);
       directions[2][1] = (current_pos[1]);
+      possibleMove = true;
     }
     else
     {
@@ -636,6 +629,7 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     {
       directions[3][0] = (current_pos[0]);
       directions[3][1] = (current_pos[1]-1);
+      possibleMove = true;
     }
     else
     {
@@ -647,6 +641,11 @@ int prepareMove(Field** matrix, Robots* robot, int counter)
     robot[counter].foundNewWall(current_pos[0], current_pos[1] - 1);
   }
   
+  if (!possibleMove)
+  {
+    gl::displayMessage("No empty coords!");
+    return SUCCESS;
+  }
 
   do
   {
@@ -696,6 +695,7 @@ int moveRobot(Field** matrix, Robots* robot, int coord_x, int coord_y, int count
   return SUCCESS;
 }
 
+
 int showResults(Robots* robot, int robotNum)
 {
   gl::displayMessage("\n=====>RESULTS<=====\n");
@@ -713,21 +713,36 @@ int showResults(Robots* robot, int robotNum)
   }
 
   gl::displayMessage("\n===================\n");
+  
   return SUCCESS;
 }
 
+int showReplay(Field** matrix)
+{
+  char temp = ' ';
+  gl::displayMessage("Watch game replay?(y/n)");
+
+  std::cin>> temp;
+  if (temp=='y')
+  {
+    	matrix[Field::endCoordX][Field::endCoordY].replayGame();
+  }
+
+  return SUCCESS;
+}
 //TODO
   //// BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE  - DONE
   //// in some way avoid robots spawning too close to finish/each other - DONE
   //// 1. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
   //// 2. implement actual mainloop with while which ends when all robots finish or too many steps
-  //* BUG -if robots are to close it just breaks
-  //* does check if too close to end affects manual input? 
+  //// BUG -if robots are to close it just breaks
+  //// does check if too close to end affects manual input? 
   //*update prepareMove to take into account previous moves?
   //*check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
   ////fix robotName issue
   //*for int functions check msg
   //*create destructors
+  //* IDEAS
   //*create list with all outputs? that way we can clear screen cmd - more clean and at end have watch highliths/replay option
 //TODO  
