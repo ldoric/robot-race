@@ -22,8 +22,9 @@
 #define FILE_READ_ERROR (-1)
 #define SUCCESS (0)
 #define MEMORY_ALLOC_ERROR (-1)
-#define MAX_ROBOTS (4)
 #define SEARCH_FAIL (-1)
+#define CREATE_ROBOT_ERROR (-1)
+#define MAX_ROBOTS (4)
 #define MAX_MOVES (100)
 
 //function declarations
@@ -88,18 +89,29 @@ int main()
   Robot = allocateRobots(robotNum);
 
   //loading level into matrix
-  levelToMatrix(data, lvlMatrix);
+  check_msg = levelToMatrix(data, lvlMatrix);
+  if(check_msg != SUCCESS){
+    gl::displayMessage("Level failed to load, check your input!");
+    return FILE_READ_ERROR;
+  }
+
+  //showing level info
   gl::displayMessage("Printing the matrix after loading the level into it");
   displayLevel(lvlMatrix);
   showLevelInfo(lvlMatrix);
 
   //creating robots
-  createRobots(lvlMatrix, Robot, robotNum);
+  check_msg = createRobots(lvlMatrix, Robot, robotNum);
+  if(check_msg != SUCCESS){
+    gl::displayMessage("Level failed to load, check your input!");
+    return CREATE_ROBOT_ERROR;
+  }
+
   gl::displayMessage("Printing the matrix after loading robots in it");
   displayLevel(lvlMatrix);
   
-  //Mainloop(to be implemented)
-  gl::displayMessage("Mainloop:\n");
+  //Mainloop
+  gl::displayMessage("Race starts now!:\n");
 
   //testing mainloop
   mainLoop(lvlMatrix, Robot, robotNum);
@@ -130,7 +142,7 @@ int mainLoop(Field** matrix, Robots* robot, int robotNum)
       if( !(robot[j].getIsAtEnd()) )
       {
         //add time delay for better visualisation
-        Sleep(1200);
+        Sleep(500);
         allAtEnd = false;
         break;
       }
@@ -762,8 +774,8 @@ int showReplay(Field** matrix)
   //// 2. implement actual mainloop with while which ends when all robots finish or too many steps
   //// BUG -if robots are to close it just breaks
   //// does check if too close to end affects manual input? 
-  //*update prepareMove to take into account previous moves?
-  //*check whether knownWalls actually stores them correctlly
+  ////update prepareMove to take into account previous moves?
+  ////check whether knownWalls actually stores them correctlly
   //// add prepareMove for robot which calls moveRobot
   ////fix robotName issue
   //*for int functions check msg
