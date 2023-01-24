@@ -150,7 +150,7 @@ void Field::replayGame()
 {
   int i=1; //counter for what move
   std::cout << "\nGame Replay:" << std::endl;
-  std::cout << "\tpress anything for next move" << std::endl;
+  std::cout << "\tpress enter for next move" << std::endl;
 
   for (auto it = moveList.begin(); it != moveList.end(); ++it)
   {

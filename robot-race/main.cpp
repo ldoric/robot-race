@@ -119,6 +119,10 @@ int main()
   showResults(Robot, robotNum);
   
   showReplay(lvlMatrix);
+
+  //free memory
+  delete[] Robot;
+  delete[] lvlMatrix;
   
 
   return 0;
@@ -779,7 +783,6 @@ int showReplay(Field** matrix)
   //// add prepareMove for robot which calls moveRobot
   ////fix robotName issue
   //*for int functions check msg
-  //*create destructors
-  //* IDEAS
-  //*create list with all outputs? that way we can clear screen cmd - more clean and at end have watch highliths/replay option
+  //* IDEAS 
 //TODO  
+
