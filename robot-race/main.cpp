@@ -60,6 +60,8 @@ int getDistanceToRobot(Field** matrix, int x, int y, int robot_x, int robot_y);
 int showResults(Robots* robot, int RobotNum);
 //printing every move once again
 int showReplay(Field** matrix);
+//exporting all robot moves to .txt files
+int exportMoves(Robots* robot, int RobotNum);
 
 int main()
 {
@@ -70,14 +72,27 @@ int main()
   int matW = 0, matH = 0;
   int check_msg = 0;
   int robotNum = 0;
+  char temp = ' ';
  
+  gl::displayMessage("------------------------------------------\n");
+  gl::displayMessage("\tWELCOME TO ROBOT RACE!!!\n");
+  gl::displayMessage("------------------------------------------");
+
+  gl::displayMessage("Press enter to start:");
+  std::cin.get();
+  
+  gl::displayMessage("Available levels:");
+  gl::displayMessage("\t=> S.txt");
+  gl::displayMessage("\t=> M.txt");
+  gl::displayMessage("\t=> L.txt");
+
   gl::displayMessage("Enter level name (txt file): ");
   std::cin>>levelName;
 
   check_msg = levelLoad("data/" + levelName, data);
 
   if(check_msg != SUCCESS){
-    gl::displayMessage("Level failed to load, check your input!");
+    gl::displayMessage("Level failed to load, check your input next time!");
     return FILE_READ_ERROR;
   }
 
@@ -107,18 +122,36 @@ int main()
     return CREATE_ROBOT_ERROR;
   }
 
-  gl::displayMessage("Printing the matrix after loading robots in it");
+  gl::displayMessage("\nPrinting the matrix after loading robots in it");
   displayLevel(lvlMatrix);
+
+  gl::displayMessage("Press enter to start the race:");
+  std::cin.get();
+  std::cin.get();
   
   //Mainloop
   gl::displayMessage("Race starts now!:\n");
 
-  //testing mainloop
   mainLoop(lvlMatrix, Robot, robotNum);
 
   showResults(Robot, robotNum);
   
-  showReplay(lvlMatrix);
+  gl::displayMessage("\noptions:\n");
+  gl::displayMessage("\t=> 1: show replay");
+  gl::displayMessage("\t=> 2: export robot moves");
+  gl::displayMessage("\t=> 3: show replay and export robot moves");
+  gl::displayMessage("\t=> 4: exit");
+
+  std::cin >> temp;
+
+  if (temp == '1') showReplay(lvlMatrix);
+  if (temp == '2') exportMoves(Robot, robotNum);
+  if (temp == '3')
+  {
+    showReplay(lvlMatrix);
+    exportMoves(Robot, robotNum);
+  } 
+
 
   //free memory
   delete[] Robot;
@@ -758,31 +791,22 @@ int showResults(Robots* robot, int robotNum)
   return SUCCESS;
 }
 
+
 int showReplay(Field** matrix)
 {
-  char temp = ' ';
-  gl::displayMessage("Watch game replay?(y/n)");
+  matrix[Field::endCoordX][Field::endCoordY].replayGame();
 
-  std::cin>> temp;
-  if (temp=='y')
+  return SUCCESS;
+}
+
+int exportMoves(Robots* robot, int RobotNum)
+{
+  for (int i = 0; i<RobotNum; i++)
   {
-    	matrix[Field::endCoordX][Field::endCoordY].replayGame();
+    robot[i].printMovmentHistory();
   }
 
   return SUCCESS;
 }
-//TODO
-  //// BUG: robots seem to freeze after "touching" each other ==> INVASTIGATE  - DONE
-  //// in some way avoid robots spawning too close to finish/each other - DONE
-  //// 1. make it so that when the robot is about to hit the $ it stops and despawns (to avoid $ moving)
-  //// 2. implement actual mainloop with while which ends when all robots finish or too many steps
-  //// BUG -if robots are to close it just breaks
-  //// does check if too close to end affects manual input? 
-  ////update prepareMove to take into account previous moves?
-  ////check whether knownWalls actually stores them correctlly
-  //// add prepareMove for robot which calls moveRobot
-  ////fix robotName issue
-  //*for int functions check msg
-  //* IDEAS 
-//TODO  
+
 

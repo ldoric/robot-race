@@ -1,5 +1,6 @@
 #include <iostream>
 #include "classes/robot.h"
+#include <fstream>
 
 Robots::Robots()
 {
@@ -63,14 +64,17 @@ void Robots::foundNewWall(int x_coord, int y_coord)
 
 void Robots::printMovmentHistory()
 { 
-
-  std::cout << "Movment History:" << std::endl;
+  int i = 0;
+  std::string symb(1, symbol);
+  std::ofstream outfile;
+  std::string filename = symb + "moves.txt";
+  outfile.open(filename, std::ios_base::app);//std::ios_base::app
+  outfile << "Movment History: \n"; 
 
   for (auto it = oldCoords.begin(); it != oldCoords.end(); ++it)
   {
-    std::cout << "\t=> " << (*it)[0] << "-" << (*it)[1] << std::endl;
+    outfile << "\t=> "<< i++ << ": "<< (*it)[0] << "-" << (*it)[1] << "\n";
   }
-  std::cout << "\n";
   
 }
 
