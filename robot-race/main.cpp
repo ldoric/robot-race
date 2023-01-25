@@ -62,6 +62,8 @@ int showResults(Robots* robot, int RobotNum);
 int showReplay(Field** matrix);
 //exporting all robot moves to .txt files
 int exportMoves(Robots* robot, int RobotNum);
+//sets all console setting and clears the screen
+void setConsole();
 
 int main()
 {
@@ -74,93 +76,110 @@ int main()
   int robotNum = 0;
   char temp = ' ';
  
-  gl::displayMessage("------------------------------------------\n");
-  gl::displayMessage("\tWELCOME TO ROBOT RACE!!!\n");
-  gl::displayMessage("------------------------------------------");
+  do{
 
-  gl::displayMessage("Press enter to start:");
-  std::cin.get();
+    setConsole();
+
+    gl::displayMessage("------------------------------------------\n");
+    gl::displayMessage("\tWELCOME TO ROBOT RACE!!!\n");
+    gl::displayMessage("------------------------------------------");
+
+    gl::displayMessage("Press enter to start:");
+    std::cin.get();
+    
+    gl::displayMessage("Available levels:");
+    gl::displayMessage("\t=> S.txt");
+    gl::displayMessage("\t=> M.txt");
+    gl::displayMessage("\t=> L.txt");
+
+    gl::displayMessage("Enter level name (txt file): ");
+    std::cin>>levelName;
+
+    check_msg = levelLoad("data/" + levelName, data);
+
+    if(check_msg != SUCCESS){
+      gl::displayMessage("Level failed to load, check your input next time!");
+      return FILE_READ_ERROR;
+    }
+
+    //getting level size
+    getMatrixSize(data, matW, matH);
+
+    //allocating memory
+    lvlMatrix = allocateMatrix(matW, matH);
+    Robot = allocateRobots(robotNum);
+
+    //loading level into matrix
+    check_msg = levelToMatrix(data, lvlMatrix);
+    if(check_msg != SUCCESS){
+      gl::displayMessage("Level failed to load, check your input!");
+      return FILE_READ_ERROR;
+    }
+
+    //showing level info
+    gl::displayMessage("Printing the matrix after loading the level into it");
+    displayLevel(lvlMatrix);
+    showLevelInfo(lvlMatrix);
+
+    //creating robots
+    check_msg = createRobots(lvlMatrix, Robot, robotNum);
+    if(check_msg != SUCCESS){
+      gl::displayMessage("Level failed to load, check your input!");
+      return CREATE_ROBOT_ERROR;
+    }
+
+    gl::displayMessage("\nPrinting the matrix after loading robots in it");
+    displayLevel(lvlMatrix);
+
+    gl::displayMessage("Press enter to start the race:");
+    std::cin.get();
+    std::cin.get();
+    
+    //Mainloop
+    gl::displayMessage("Race starts now!:\n");
+
+    mainLoop(lvlMatrix, Robot, robotNum);
+
+    showResults(Robot, robotNum);
+    
+    gl::displayMessage("\noptions:\n");
+    gl::displayMessage("\t=> 1: show replay");
+    gl::displayMessage("\t=> 2: export robot moves");
+    gl::displayMessage("\t=> 3: show replay and export robot moves");
+    gl::displayMessage("\t=> 4: proceed to end");
+
+    std::cin >> temp;
+
+    if (temp == '1') showReplay(lvlMatrix);
+    if (temp == '2') exportMoves(Robot, robotNum);
+    if (temp == '3')
+    {
+      showReplay(lvlMatrix);
+      exportMoves(Robot, robotNum);
+    } 
+
+    gl::displayMessage("\t=> 1: play again");
+    gl::displayMessage("\t=> 2: exit");
+    std::cin >> temp;
+
+    //free memory
+    delete[] Robot;
+    delete[] lvlMatrix;
+    robotNum = 0;
   
-  gl::displayMessage("Available levels:");
-  gl::displayMessage("\t=> S.txt");
-  gl::displayMessage("\t=> M.txt");
-  gl::displayMessage("\t=> L.txt");
-
-  gl::displayMessage("Enter level name (txt file): ");
-  std::cin>>levelName;
-
-  check_msg = levelLoad("data/" + levelName, data);
-
-  if(check_msg != SUCCESS){
-    gl::displayMessage("Level failed to load, check your input next time!");
-    return FILE_READ_ERROR;
-  }
-
-  //getting level size
-  getMatrixSize(data, matW, matH);
-
-  //allocating memory
-  lvlMatrix = allocateMatrix(matW, matH);
-  Robot = allocateRobots(robotNum);
-
-  //loading level into matrix
-  check_msg = levelToMatrix(data, lvlMatrix);
-  if(check_msg != SUCCESS){
-    gl::displayMessage("Level failed to load, check your input!");
-    return FILE_READ_ERROR;
-  }
-
-  //showing level info
-  gl::displayMessage("Printing the matrix after loading the level into it");
-  displayLevel(lvlMatrix);
-  showLevelInfo(lvlMatrix);
-
-  //creating robots
-  check_msg = createRobots(lvlMatrix, Robot, robotNum);
-  if(check_msg != SUCCESS){
-    gl::displayMessage("Level failed to load, check your input!");
-    return CREATE_ROBOT_ERROR;
-  }
-
-  gl::displayMessage("\nPrinting the matrix after loading robots in it");
-  displayLevel(lvlMatrix);
-
-  gl::displayMessage("Press enter to start the race:");
-  std::cin.get();
-  std::cin.get();
-  
-  //Mainloop
-  gl::displayMessage("Race starts now!:\n");
-
-  mainLoop(lvlMatrix, Robot, robotNum);
-
-  showResults(Robot, robotNum);
-  
-  gl::displayMessage("\noptions:\n");
-  gl::displayMessage("\t=> 1: show replay");
-  gl::displayMessage("\t=> 2: export robot moves");
-  gl::displayMessage("\t=> 3: show replay and export robot moves");
-  gl::displayMessage("\t=> 4: exit");
-
-  std::cin >> temp;
-
-  if (temp == '1') showReplay(lvlMatrix);
-  if (temp == '2') exportMoves(Robot, robotNum);
-  if (temp == '3')
-  {
-    showReplay(lvlMatrix);
-    exportMoves(Robot, robotNum);
-  } 
-
-
-  //free memory
-  delete[] Robot;
-  delete[] lvlMatrix;
-  
-
+  }while(temp == '1');
   return 0;
 }
 
+
+void setConsole()
+{
+  system("mode con cols=55 lines=40");
+  system("title The Robot Race");
+  system("color 0F");
+  system("prompt $G");
+  system("cls");
+}
 
 int mainLoop(Field** matrix, Robots* robot, int robotNum)
 {
