@@ -69,7 +69,7 @@ void Robots::printMovmentHistory()
   std::ofstream outfile;
   std::string filename = symb + "moves.txt";
   outfile.open(filename, std::ios_base::app);//std::ios_base::app
-  outfile << "Movment History: \n"; 
+  outfile << "Movement History: \n"; 
 
   for (auto it = oldCoords.begin(); it != oldCoords.end(); ++it)
   {
