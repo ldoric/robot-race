@@ -13,8 +13,7 @@ Welcome to RobotRace, a C++ console application that simulates a robot race thro
 <br>Each robot, represented by letters A-D, competes to be the first to reach the finish line.
 <br>And.. yes you can use it as a gambling game!
 
-[![Watch the Demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=nhb9gVvAtVE)
-[<img src="https://i.ytimg.com/vi/Hc79sDi3f0U/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=Hc79sDi3f0U "Now in Android: 55")
+
 
 ## Features
 
@@ -28,7 +27,7 @@ Welcome to RobotRace, a C++ console application that simulates a robot race thro
 ## Gameplay Preview
 
 ![Gameplay Gif](https://github.com/mjospovich/robot-race/blob/main/assets/show.gif)
-[!Gameplay Gif](https://github.com/mjospovich/robot-race/blob/main/assets/show.gif)](https://www.youtube.com/watch?v=nhb9gVvAtVE)
+[![Watch the Demo](https://github.com/mjospovich/robot-race/blob/main/assets/show.gif)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
 ## Matrix Load and Initialization
 
