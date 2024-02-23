@@ -13,6 +13,8 @@ Welcome to RobotRace, a C++ console application that simulates a robot race thro
 <br>Each robot, represented by letters A-D, competes to be the first to reach the finish line.
 <br>And.. yes you can use it as a gambling game!
 
+[![Watch the Demo](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=nhb9gVvAtVE)
+
 ## Features
 
 - **Multiple Levels**: Choose from three different maze sizes: Small, Medium, and Large.
