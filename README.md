@@ -28,6 +28,7 @@ Welcome to RobotRace, a C++ console application that simulates a robot race thro
 ## Gameplay Preview
 
 ![Gameplay Gif](https://github.com/mjospovich/robot-race/blob/main/assets/show.gif)
+[!Gameplay Gif](https://github.com/mjospovich/robot-race/blob/main/assets/show.gif)](https://www.youtube.com/watch?v=nhb9gVvAtVE)
 
 ## Matrix Load and Initialization
 
